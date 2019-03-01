@@ -1,0 +1,58 @@
+group 'me.midest'
+version '1.2d'
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+jar.baseName = "Visitor"
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+repositories{
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.controlsfx:controlsfx:8.40.+',
+            'org.apache.poi:poi:3.+',
+            'org.apache.poi:openxml4j:1.+',
+            'org.apache.poi:poi-ooxml:3.+'
+
+}
+dependencies{
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs = ['ext']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['test']
+        }
+    }
+}
+
+
+mainClassName = "me.midest.Main"
+
+def lib = "lib"
+task copyToLib( type: Copy ) {
+    into "$buildDir/libs/".concat( lib )
+    from configurations.runtime
+}
+
+jar {
+    manifest.attributes("Main-Class": mainClassName,
+            "Class-Path": " . " + configurations.compile.collect { lib + '/' + it.getName() }.join(' '))
+    dependsOn copyToLib
+}

@@ -1,0 +1,10 @@
+# Settings
+.idea/
+.gradle/
+gradle/
+gradlew*
+settings.gradle
+# Build
+build/
+out/
+spikes/
