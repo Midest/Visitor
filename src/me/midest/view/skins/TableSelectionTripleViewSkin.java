@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018 Dmitry Molkov
+ * Copyright (c) 2018 Dmitrii Molkov
  * Copyright (c) 2014, 2018 ControlsFX
  * All rights reserved.
  *
