@@ -20,6 +20,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.TextFlow?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.control.Tooltip?>
 <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.181" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.midest.view.ControllerOverview">
    <children>
       <TabPane tabClosingPolicy="UNAVAILABLE" prefHeight="700.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -54,6 +55,24 @@
                                          <Insets bottom="5.0" left="5.0" right="5.0" top="0.0" />
                                      </HBox.margin>
                                  </TextFlow>
+                                <TextFlow prefHeight="25.0"  minWidth="200" prefWidth="300.0" HBox.hgrow="ALWAYS" >
+                                   <Text text="Теоретический рейтинг: " style="-fx-font-weight: bold"/>
+                                   <Text fx:id="maxRatingLabel"/>
+                                   <HBox.margin>
+                                      <Insets bottom="5.0" left="5.0" right="5.0" top="0.0" />
+                                   </HBox.margin>
+                                </TextFlow>
+                                <TextFlow prefHeight="25.0"  minWidth="150" prefWidth="200.0" HBox.hgrow="ALWAYS" >
+                                   <Label text="Отношения: " style="-fx-font-weight: bold">
+                                      <tooltip>
+                                         <Tooltip text="Отношения фактического рейтинга к теоретическому и наоборот"/>
+                                      </tooltip>
+                                   </Label>
+                                   <Text fx:id="ratioRatingLabel"/>
+                                   <HBox.margin>
+                                      <Insets bottom="5.0" left="5.0" right="5.0" top="0.0" />
+                                   </HBox.margin>
+                                </TextFlow>
                                  <TextFlow prefHeight="25.0" prefWidth="10000.0" HBox.hgrow="ALWAYS" textAlignment="RIGHT">
                                      <Text text="Обязательные: " style="-fx-font-weight: bold"/>
                                      <Text fx:id="checkLabelSecond"/>

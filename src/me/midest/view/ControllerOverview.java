@@ -12,6 +12,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Pair;
 import me.midest.Main;
 import me.midest.logic.coupling.PeriodCoupling;
+import me.midest.logic.coupling.TheoreticalVisitsValue;
 import me.midest.logic.coupling.VisitsValue;
 import me.midest.logic.files.WorkbookWriter;
 import me.midest.logic.report.VisitsTable;
@@ -24,8 +25,11 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -57,6 +61,10 @@ public class ControllerOverview {
     private Button computeRating;
     @FXML
     private Text ratingLabel;
+    @FXML
+    private Text maxRatingLabel;
+    @FXML
+    private Text ratioRatingLabel;
     @FXML
     private Text checkLabelSecond;
     @FXML
@@ -222,15 +230,71 @@ public class ControllerOverview {
     private void validateLabels( boolean valid ){
         String css = valid ? "-fx-fill: #000000" : "-fx-fill: #ff0000";
         ratingLabel.setStyle( css );
+        maxRatingLabel.setStyle( css );
+        ratioRatingLabel.setStyle( css );
         checkLabelSecond.setStyle( css );
         checkLabelTarget.setStyle( css );
     }
 
     private void calculateRating() {
         List<Visit> visits = new ArrayList<>();
-        visitsTables.getTargetItems().forEach( v -> visits.add(v.getVisit()));
+        visitsTables.getTargetItems().forEach( v -> visits.add( v.getVisit()));
         double rating = VisitsValue.count( visits );
+        double maxRating = maxRating();
         ratingLabel.setText( String.format( "%.2f", rating ));
+        maxRatingLabel.setText( String.format( "%.2f", maxRating ) );
+        ratioRatingLabel.setText( String.format( "%.2f | %.2f", rating / maxRating, maxRating / rating ) );
+    }
+
+    private double maxRating() {
+        if( visitsTables.getSourceItems().size() + visitsTables.getTargetItems().size() < 2 )
+            return 0;
+        int bossVisitors = 0;
+        int otherVisitors = 0;
+        for( TutorFX tut : tutorsTable.getItems() ){
+            if( tut.getTutor().isVisitor()){
+                if( tut.getTutor().isBoss()) bossVisitors++;
+                else otherVisitors++;
+            }
+        }
+        Set<String> disciplines = collect( o -> o.getVisit().getVisit().getDiscipline() );
+        Set<String> lessonTypes = collect( o -> o.getVisit().getVisit().getType() );
+        Set<String> groups = collect( o -> o.getVisit().getVisit().getType() );
+
+        LocalDate first = LocalDate.MAX;
+        LocalDate last = LocalDate.MIN;
+        Visit v;
+        LocalDate date;
+        for( VisitFX vis : visitsTables.getSourceItems()){
+            v = vis.getVisit();
+            date = v.getVisit().getDate();
+            if( date.isBefore( first ))
+                first = date;
+            if( date.isAfter( last ))
+                last = date;
+        }
+        for( VisitFX vis : visitsTables.getTargetItems()){
+            v = vis.getVisit();
+            date = v.getVisit().getDate();
+            if( date.isBefore( first ))
+                first = date;
+            if( date.isAfter( last ))
+                last = date;
+        }
+        return TheoreticalVisitsValue.upperBound( first, last, bossVisitors, otherVisitors,
+                visitsTables.getTargetItems().size(), disciplines.size(), lessonTypes.size(), groups.size() );
+    }
+
+    private Set<String> collect( Function<VisitFX,String> mapper ){
+        Set<String> strings = visitsTables.getSourceItems()
+                .parallelStream()
+                .map( mapper )
+                .collect( Collectors.toSet() );
+        strings.addAll( visitsTables.getTargetItems()
+                .parallelStream()
+                .map( mapper )
+                .collect( Collectors.toSet() ));
+        return strings;
     }
 
     public void setMain( Main main ) {
