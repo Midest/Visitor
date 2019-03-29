@@ -38,11 +38,11 @@ public class VisitsMetrics {
     public static Long evaluateMax( Visit first, Visit second ){
         Lesson l1 = first.getVisit();
         Lesson l2 = second.getVisit();
-        Integer max = l1.getTutor().equals( l2.getTutor() ) ? 0 : TUTOR_WEIGHT;
-        max = Math.max( max, l1.getDiscipline().equals( l2.getDiscipline()) ? 0 : DISCIPLINE_WEIGHT );
-        max = Math.max( max, l1.getType().equals( l2.getType()) ? 0 : LESSON_TYPE_WEIGHT );
-        max = Math.max( max, first.getVisitor().equals( second.getVisitor() ) ? 0 : VISITOR_WEIGHT );
-        max = Math.max( max, l1.getGroup().equals( l2.getGroup()) ? 0 : GROUP_WEIGHT );
+        Integer max = l1.getTutor().equals( l2.getTutor() ) ? 0 : Weight.TUTOR.getWeight();
+        max = Math.max( max, l1.getDiscipline().equals( l2.getDiscipline()) ? 0 : Weight.DISCIPLINE.getWeight() );
+        max = Math.max( max, l1.getType().equals( l2.getType()) ? 0 : Weight.LESSON_TYPE.getWeight() );
+        max = Math.max( max, first.getVisitor().equals( second.getVisitor() ) ? 0 : Weight.VISITOR.getWeight() );
+        max = Math.max( max, l1.getGroup().equals( l2.getGroup()) ? 0 : Weight.GROUP.getWeight() );
         Long maxL = Long.valueOf( max );
         Long days = Duration.between( l1.getDate().atStartOfDay(), l2.getDate().atStartOfDay() )
                 .abs().getSeconds() / SECONDS_PER_DAY;
@@ -64,11 +64,11 @@ public class VisitsMetrics {
 
         Lesson l1 = first.getVisit();
         Lesson l2 = second.getVisit();
-        Integer max = l1.getTutor().equals( l2.getTutor() ) ? 0 : TUTOR_WEIGHT;
-        max += l1.getDiscipline().equals( l2.getDiscipline()) ? 0 : DISCIPLINE_WEIGHT;
-        max += l1.getType().equals( l2.getType()) ? 0 : LESSON_TYPE_WEIGHT;
-        max += first.getVisitor().equals( second.getVisitor() ) ? 0 : VISITOR_WEIGHT;
-        max += l1.getGroup().equals( l2.getGroup()) ? 0 : GROUP_WEIGHT;
+        Integer max = l1.getTutor().equals( l2.getTutor() ) ? 0 : Weight.TUTOR.getWeight();
+        max += l1.getDiscipline().equals( l2.getDiscipline()) ? 0 : Weight.DISCIPLINE.getWeight();
+        max += l1.getType().equals( l2.getType()) ? 0 : Weight.LESSON_TYPE.getWeight();
+        max += first.getVisitor().equals( second.getVisitor() ) ? 0 : Weight.VISITOR.getWeight();
+        max += l1.getGroup().equals( l2.getGroup()) ? 0 : Weight.GROUP.getWeight();
         maxL = Long.valueOf( max );
         Long days = Duration.between( l1.getDate().atStartOfDay(), l2.getDate().atStartOfDay() )
                 .abs().getSeconds() / SECONDS_PER_DAY;
@@ -92,12 +92,24 @@ public class VisitsMetrics {
     }
 
     private static final Long SECONDS_PER_DAY = 24*60*60L;
-
-    private static final Integer TUTOR_WEIGHT = 500;
-    private static final Integer DISCIPLINE_WEIGHT = 50;
-    private static final Integer LESSON_TYPE_WEIGHT = 25;
-    private static final Integer VISITOR_WEIGHT = 15;
-    private static final Integer GROUP_WEIGHT = 5;
     private static final Integer DATE_WEIGHT_MULTIPLIER = 1;
+
+    enum Weight{
+        TUTOR(500),
+        DISCIPLINE(50),
+        LESSON_TYPE(25),
+        VISITOR(15),
+        GROUP(5)
+        ;
+
+        private int weight;
+        Weight( int weight ){
+            this.weight = weight;
+        }
+
+        public int getWeight(){
+            return weight;
+        }
+    }
 
 }
