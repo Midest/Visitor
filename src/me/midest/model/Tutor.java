@@ -255,7 +255,7 @@ public class Tutor implements Comparable<Tutor>, CharSequence{
         }
 
         public static Status byName( String name ){
-            for( Status s : values()) if( s.getStatus().equals(name))
+            for( Status s : values()) if( s.getStatus().equalsIgnoreCase(name))
                 return s;
             return null;
         }
