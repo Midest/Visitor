@@ -28,8 +28,8 @@ public class PeriodCoupling {
     private Set<String> outerRooms;
     /** Список преподавателей, которые не относятся к кафедре (и не посещаются). */
     private Set<Tutor> outerTutors;
-    /** Список типов занятий, которые нежелательно посещать */ //FIXME пока что их нельзя посещать
-    Set<String> unwantedTypes;
+    /** Список типов занятий, которые нежелательно посещать */
+    private Set<String> unwantedTypes;
     /** Список тех, для чьих пар не удалось найти возможностей посещения. */
     private Set<Tutor> withoutPossibleVisits;
 
@@ -289,7 +289,6 @@ public class PeriodCoupling {
         return visits;
     }
 
-    //TODO добавить праздничные даты
     /**
      * Проверка, подходит ли дата. Проверяет день недели.
      * @param date дата
@@ -303,10 +302,8 @@ public class PeriodCoupling {
                     && !dayOfWeek.equals( DayOfWeek.SUNDAY ));
     }
 
-    //TODO добавить отдельно ограничения по датам посещения для посещающего
     /** Проверка ограничений по датам для посещающих */
     private boolean dateForVisitorIsOk( Tutor visitor, Lesson lesson ) {
-        //return lesson.getDate().isAfter( LocalDate.of(2017,10,18) ) || lesson.getDate().isBefore( LocalDate.of( 2017,9,5 ) );
         return true;
     }
 
