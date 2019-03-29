@@ -18,9 +18,13 @@ public class VisitsValue {
             return 0;
         int vSize = visits.size();
         int vPairsSize = vSize * ( vSize - 1 ) / 2;
-        double L = allPairsSum( visits )/ (double) vPairsSize;
+        double L = allPairsSum( visits ) / (double) vPairsSize;
         double R = rulesSum( visits ) / (double) vSize;
         return L + ( DELTA * R / vSize );
+    }
+
+    public static double delta(){
+        return DELTA;
     }
 
     private static long rulesSum( Collection<? extends Visit> visits ) {
