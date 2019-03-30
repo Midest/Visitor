@@ -30,6 +30,8 @@ package me.midest.view.skins;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -64,6 +66,7 @@ public class TableSelectionTripleViewSkin<T> extends SkinBase<TableSelectionTrip
     private Button copyToSecond;
     private Button removeFromSecond;
     private Button loadFileToSecond;
+    private Button saveFileFromSecond;
     private Button moveToTarget;
     private Button moveToTargetAll;
     private Button moveToSourceAll;
@@ -245,7 +248,9 @@ public class TableSelectionTripleViewSkin<T> extends SkinBase<TableSelectionTrip
                 fontAwesome.create(FontAwesome.Glyph.REMOVE));
         loadFileToSecond = new Button("",
                 fontAwesome.create(FontAwesome.Glyph.FILE_TEXT_ALT));
-        box.getChildren().addAll(copyToSecond, removeFromSecond, loadFileToSecond);
+        saveFileFromSecond = new Button("",
+                fontAwesome.create(FontAwesome.Glyph.SAVE));
+        box.getChildren().addAll(copyToSecond, removeFromSecond, loadFileToSecond, saveFileFromSecond);
 
         return box;
     }
@@ -284,7 +289,9 @@ public class TableSelectionTripleViewSkin<T> extends SkinBase<TableSelectionTrip
                 fontAwesome.create(FontAwesome.Glyph.REMOVE));
         loadFileToSecond = new Button("",
                 fontAwesome.create(FontAwesome.Glyph.FILE_TEXT_ALT));
-        box.getChildren().addAll(copyToSecond, removeFromSecond, loadFileToSecond);
+        saveFileFromSecond = new Button("",
+                fontAwesome.create(FontAwesome.Glyph.SAVE));
+        box.getChildren().addAll(copyToSecond, removeFromSecond, loadFileToSecond, saveFileFromSecond);
 
         return box;
     }
@@ -316,6 +323,7 @@ public class TableSelectionTripleViewSkin<T> extends SkinBase<TableSelectionTrip
         copyToSecond.getStyleClass().add("copy-to-second");
         removeFromSecond.getStyleClass().add("remove-from-second");
         loadFileToSecond.getStyleClass().add("load-file-to-second");
+        saveFileFromSecond.getStyleClass().add("save-file-from-second");
         moveToTarget.getStyleClass().add( "move-to-target-button" );
         moveToTargetAll.getStyleClass().add( "move-to-target-all-button" );
         moveToSource.getStyleClass().add( "move-to-source-button" );
@@ -324,6 +332,7 @@ public class TableSelectionTripleViewSkin<T> extends SkinBase<TableSelectionTrip
         copyToSecond.setMaxWidth( Double.MAX_VALUE );
         removeFromSecond.setMaxWidth( Double.MAX_VALUE );
         loadFileToSecond.setMaxWidth( Double.MAX_VALUE );
+        saveFileFromSecond.setMaxWidth( Double.MAX_VALUE );
         moveToTarget.setMaxWidth( Double.MAX_VALUE );
         moveToTargetAll.setMaxWidth( Double.MAX_VALUE );
         moveToSource.setMaxWidth(Double.MAX_VALUE);
@@ -516,6 +525,10 @@ public class TableSelectionTripleViewSkin<T> extends SkinBase<TableSelectionTrip
                 currentItems.addAll( list );
             }
         } );
+    }
+
+    public void setSaveFileFromSecondAction( EventHandler<ActionEvent> action ) {
+        saveFileFromSecond.setOnAction( action );
     }
 
     private void copyToSecond() {

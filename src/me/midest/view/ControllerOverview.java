@@ -15,6 +15,7 @@ import me.midest.logic.coupling.PeriodCoupling;
 import me.midest.logic.coupling.TheoreticalVisitsValue;
 import me.midest.logic.coupling.VisitsValue;
 import me.midest.logic.files.TxtReader;
+import me.midest.logic.files.TxtWriter;
 import me.midest.logic.files.WorkbookWriter;
 import me.midest.logic.report.VisitsTable;
 import me.midest.model.FixedVisit;
@@ -287,6 +288,23 @@ public class ControllerOverview {
             }
             return null;
         } );
+        view.setSaveFileFromSecondAction( event -> {
+            if( main.getSecond().isEmpty())
+                event.consume();
+            allFileChooser.setTitle( "Выберите файл для фиксированных посещений" );
+            File selectedFile = allFileChooser.showSaveDialog( main.getPrimaryStage() );
+            List<FixedVisit> result = main.getSecond().stream()
+                    .map( v -> new FixedVisit(
+                            v.getVisit().getVisit().getTutor(),
+                            v.getVisit().getVisitor(),
+                            v.getVisit().getVisit().getTime(),
+                            v.getVisit().getVisit().getDate()))
+                    .collect( Collectors.toList());
+            if( selectedFile != null ) {
+                allFileChooser.setInitialDirectory( selectedFile.getParentFile() );
+                TxtWriter.writeFixedVisits( selectedFile.getAbsolutePath(), result );
+            }
+        });
     }
 
     private void validateLabels( boolean valid ){
