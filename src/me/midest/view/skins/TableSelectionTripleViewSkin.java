@@ -321,24 +321,6 @@ public class TableSelectionTripleViewSkin<T> extends SkinBase<TableSelectionTrip
         moveToSource.setMaxWidth(Double.MAX_VALUE);
         moveToSourceAll.setMaxWidth(Double.MAX_VALUE);
 
-        getSourceTableView().itemsProperty().addListener(
-                it -> bindCopyRemoverButtonsToDataModel());
-
-        getSecondTableView().itemsProperty().addListener(
-                it -> bindCopyRemoverButtonsToDataModel() );
-
-        getSourceTableView().itemsProperty().addListener(
-                it -> bindMoveAllButtonsToDataModel() );
-
-        getTargetTableView().itemsProperty().addListener(
-                it -> bindMoveAllButtonsToDataModel() );
-
-        getSourceTableView().selectionModelProperty().addListener(
-                it -> bindMoveButtonsToSelectionModel());
-
-        getTargetTableView().selectionModelProperty().addListener(
-                it -> bindMoveButtonsToSelectionModel());
-
         bindCopyRemoverButtonsToDataModel();
         bindMoveButtonsToSelectionModel();
         bindMoveAllButtonsToDataModel();
