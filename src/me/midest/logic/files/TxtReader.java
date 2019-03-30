@@ -10,6 +10,8 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class TxtReader {
@@ -25,7 +27,8 @@ public class TxtReader {
     private static <T> List<T> readLines( String fileName, Class<T> clazz ){
         List<T> list = new ArrayList<>();
         try (Stream<String> stream = Files.lines( Paths.get(fileName), Charset.forName("utf8"))) {
-            stream.forEach( line -> list.add( processLine( line, clazz )));
+            list = stream.map( line -> processLine( line, clazz ) )
+                    .filter( Objects::nonNull ).collect( Collectors.toList() );
         } catch ( Exception e ){
             e.printStackTrace();
         }
@@ -35,6 +38,8 @@ public class TxtReader {
     private static <T> T processLine( String line, Class<T> clazz ){
         if( clazz.equals( Tutor.class )) {
             String[] l = line.split( "\\|" );
+            if( l.length < 4 )
+                return null;
             Tutor t = new Tutor( l[0], Tutor.Status.byName( l[1] ), l[2].equals( "1" ), l[3].equals( "1" ) );
             if( l.length > 4 )
                 t.setDepartment( l[5] );
@@ -44,6 +49,8 @@ public class TxtReader {
         }
         else if( clazz.equals( FixedVisit.class )) {
             String[] l = line.split( "," );
+            if( l.length != 4 )
+                return null;
             Tutor t = new Tutor( l[0] );
             Tutor v = new Tutor( l[1] );
             TimeInterval ti = new TimeInterval( l[2] );
