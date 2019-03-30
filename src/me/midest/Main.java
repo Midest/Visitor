@@ -94,6 +94,9 @@ public class Main extends Application {
         return target;
     }
 
+    public ObservableList<TutorFX> getTutors() {
+        return tutors;
+    }
 
     public void loadSchedule( String fileName ) {
         try {
