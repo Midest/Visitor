@@ -14,13 +14,18 @@ import me.midest.Main;
 import me.midest.logic.coupling.PeriodCoupling;
 import me.midest.logic.coupling.TheoreticalVisitsValue;
 import me.midest.logic.coupling.VisitsValue;
+import me.midest.logic.files.TxtReader;
+import me.midest.logic.files.TxtWriter;
 import me.midest.logic.files.WorkbookWriter;
 import me.midest.logic.report.VisitsTable;
+import me.midest.model.FixedVisit;
+import me.midest.model.Lesson;
 import me.midest.model.Tutor;
 import me.midest.model.Visit;
 import me.midest.model.fx.TutorFX;
 import me.midest.model.fx.VisitFX;
 import me.midest.view.controls.TableSelectionTripleView;
+import me.midest.view.skins.TableSelectionTripleViewSkin;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.File;
@@ -76,15 +81,17 @@ public class ControllerOverview {
     @FXML
     private Button saveTutor;
 
-    final FileChooser fileChooser = new FileChooser();
+    final FileChooser xlsFileChooser = new FileChooser();
+    final FileChooser allFileChooser = new FileChooser();
 
     @FXML
     private void initialize() {
         visitsTableService = new VisitsTable();
         workbookWriterService = new WorkbookWriter();
-        fileChooser.setInitialDirectory( new File( System.getProperty( "user.dir" ) ));
-        fileChooser.getExtensionFilters().add(
+        xlsFileChooser.setInitialDirectory( new File( System.getProperty( "user.dir" ) ));
+        xlsFileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("файлы Excel", "*.xls", "*.xlsx"));
+        allFileChooser.setInitialDirectory( new File( System.getProperty( "user.dir" ) ));
 
         List<TableColumn<TutorFX, String>> list = createCols( new Pair<>( "name", "Имя" ), new Pair<>( "weight", "Должность" ) );
         tutorsTable.getColumns().addAll( list );
@@ -96,12 +103,12 @@ public class ControllerOverview {
         tutorNameField.setEditable( false );
         tutorWeightCombo.setItems( FXCollections.observableArrayList( Tutor.Status.values() ));
         loadSchedule.setOnAction( e -> {
-            fileChooser.setTitle( "Выберите файл расписания занятий преподавателей" );
-            File selectedFile = fileChooser.showOpenDialog( main.getPrimaryStage() );
+            xlsFileChooser.setTitle( "Выберите файл расписания занятий преподавателей" );
+            File selectedFile = xlsFileChooser.showOpenDialog( main.getPrimaryStage() );
             if (selectedFile != null) {
                 main.loadSchedule( selectedFile.getAbsolutePath() );
                 openedFile.setText( selectedFile.getAbsolutePath() );
-                fileChooser.setInitialDirectory( selectedFile.getParentFile() );
+                xlsFileChooser.setInitialDirectory( selectedFile.getParentFile() );
                 computeRating();
             }
         });
@@ -117,10 +124,10 @@ public class ControllerOverview {
         optimizeSchedule.setOnAction( e -> main.optimize() );
         computeRating.setOnAction( e -> { if( main.isInitialized()) computeRating(); });
         saveSchedule.setOnAction( e -> { if( !visitsTables.getTargetItems().isEmpty()) {
-            fileChooser.setTitle( "Сохранить итоговое расписание как" );
-            File selectedFile = fileChooser.showSaveDialog( main.getPrimaryStage() );
+            xlsFileChooser.setTitle( "Сохранить итоговое расписание как" );
+            File selectedFile = xlsFileChooser.showSaveDialog( main.getPrimaryStage() );
             if( selectedFile != null ) {
-                fileChooser.setInitialDirectory( selectedFile.getParentFile() );
+                xlsFileChooser.setInitialDirectory( selectedFile.getParentFile() );
                 List<Visit> result = visitsTables.getTargetItems().parallelStream().map( VisitFX::getVisit ).collect( Collectors.toList() );
                 Workbook wb = null;
                 if( selectedFile.getName().endsWith( ".xls" ) ) {
@@ -225,6 +232,79 @@ public class ControllerOverview {
             if( c.getAddedSize()!= 0 || c.getRemovedSize() != 0 )
                 validateLabels( false );
         } );
+        initActions();
+    }
+
+    private void initActions() {
+        TableSelectionTripleViewSkin<VisitFX> view = ( (TableSelectionTripleViewSkin<VisitFX>) visitsTables.getSkin() );
+        view.setLoadFileToSecondAction( () -> {
+            if( main.getSource().isEmpty() && main.getTarget().isEmpty())
+                return null;
+            allFileChooser.setTitle( "Выберите файл фиксированных посещений" );
+            File selectedFile = allFileChooser.showOpenDialog( main.getPrimaryStage() );
+            List<VisitFX> result = new ArrayList<>();
+            if( selectedFile != null ){
+                allFileChooser.setInitialDirectory( selectedFile.getParentFile() );
+                List<FixedVisit> fixed = TxtReader.readFixedVisits( selectedFile.getAbsolutePath() );
+
+                /* Собираем текущие данные */
+                List<Tutor> tutorsList = main.getTutors()
+                        .parallelStream().map( TutorFX::getTutor ).collect( Collectors.toList() );
+                Set<Lesson> lessons = main.getSource()
+                        .parallelStream().map( v -> v.getVisit().getVisit() ).collect( Collectors.toSet() );
+                lessons.addAll( main.getTarget()
+                        .parallelStream().map( v -> v.getVisit().getVisit() ).collect( Collectors.toSet() ));
+
+                /* Ищем */
+                Tutor v = null;
+                Visit vis;
+                VisitFX vfx;
+                for( FixedVisit f : fixed ) {
+                    for( Tutor t : tutorsList ) if( t.equals( f.getVisitor())){
+                        v = t;
+                        break;
+                    }
+                    if( v != null ) for( Lesson l : lessons ) {
+                        if( l.getTime().equals( f.getTime() )
+                                && l.getDate().equals( f.getDate() )
+                                && l.getTutor().equals( f.getTutor() ) ) {
+                            vis = new Visit( v, l );
+                            vfx = new VisitFX( vis );
+                            boolean added = false;
+                            for( VisitFX mvfx : main.getSource()) if( mvfx.equals( vfx )
+                                    && mvfx.getVisit().getVisit().getTutor().equals( l.getTutor() )){
+                                result.add( mvfx );
+                                added = true;
+                                break;
+                            }
+                            if( !added ) for( VisitFX mvfx : main.getTarget()) if( mvfx.equals( vfx )
+                                    && mvfx.getVisit().getVisit().getTutor().equals( l.getTutor() )){
+                                result.add( mvfx );
+                            }
+                        }
+                    }
+                }
+                return result;
+            }
+            return null;
+        } );
+        view.setSaveFileFromSecondAction( event -> {
+            if( main.getSecond().isEmpty())
+                event.consume();
+            allFileChooser.setTitle( "Выберите файл для фиксированных посещений" );
+            File selectedFile = allFileChooser.showSaveDialog( main.getPrimaryStage() );
+            List<FixedVisit> result = main.getSecond().stream()
+                    .map( v -> new FixedVisit(
+                            v.getVisit().getVisit().getTutor(),
+                            v.getVisit().getVisitor(),
+                            v.getVisit().getVisit().getTime(),
+                            v.getVisit().getVisit().getDate()))
+                    .collect( Collectors.toList());
+            if( selectedFile != null ) {
+                allFileChooser.setInitialDirectory( selectedFile.getParentFile() );
+                TxtWriter.writeFixedVisits( selectedFile.getAbsolutePath(), result );
+            }
+        });
     }
 
     private void validateLabels( boolean valid ){
