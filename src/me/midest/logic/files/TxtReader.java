@@ -36,9 +36,10 @@ public class TxtReader {
         if( clazz.equals( Tutor.class )) {
             String[] l = line.split( "\\|" );
             Tutor t = new Tutor( l[0], Tutor.Status.byName( l[1] ), l[2].equals( "1" ), l[3].equals( "1" ) );
-            if( l.length >= 5 )
-                t.setRegalia( l[4] );
-            t.setDepartment( " кафедры 714" );
+            if( l.length > 4 )
+                t.setDepartment( l[5] );
+            if( l.length > 5 )
+                t.setRegalia( l[5] );
             return (T) t;
         }
         else if( clazz.equals( FixedVisit.class )) {
