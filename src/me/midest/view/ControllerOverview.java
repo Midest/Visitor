@@ -57,6 +57,8 @@ public class ControllerOverview {
     @FXML
     private CheckBox tutorVisiteeCheck;
     @FXML
+    private TextField tutorTitlesField;
+    @FXML
     private Button loadSchedule;
     @FXML
     private Button generateSchedule;
@@ -93,9 +95,14 @@ public class ControllerOverview {
                 new FileChooser.ExtensionFilter("файлы Excel", "*.xls", "*.xlsx"));
         allFileChooser.setInitialDirectory( new File( System.getProperty( "user.dir" ) ));
 
-        List<TableColumn<TutorFX, String>> list = createCols( new Pair<>( "name", "Имя" ), new Pair<>( "weight", "Должность" ) );
+        List<TableColumn<TutorFX, String>> list = createCols(
+                new Pair<>( "name", "Имя" ),
+                new Pair<>( "weight", "Должность" ),
+                new Pair<>( "titles", "Звания, степени" )  );
         tutorsTable.getColumns().addAll( list );
-        List<TableColumn<TutorFX, Boolean>> list2 = createCols(  new Pair<>( "visitor", "Проверяющий" ), new Pair<>( "visitee", "Посещаемый" ) );
+        List<TableColumn<TutorFX, Boolean>> list2 = createCols(
+                new Pair<>( "visitor", "Проверяющий" ),
+                new Pair<>( "visitee", "Посещаемый" ) );
             list2.forEach( c -> c.setCellFactory( col -> new CheckBoxTableCell<>() ) );
         tutorsTable.getColumns().addAll( list2 );
         tutorsTable.getSelectionModel().selectedItemProperty().addListener(
@@ -148,6 +155,7 @@ public class ControllerOverview {
             TutorFX selected = tutorsTable.getSelectionModel().getSelectedItem();
             if( selected != null ){
                 selected.setWeight( tutorWeightCombo.getSelectionModel().getSelectedItem());
+                selected.setTitles( tutorTitlesField.getText());
                 selected.visitorProperty().set( tutorVisitorCheck.isSelected());
                 selected.visiteeProperty().set( tutorVisiteeCheck.isSelected());
             }
@@ -195,6 +203,7 @@ public class ControllerOverview {
         tutorWeightCombo.setValue( tutor == null? tutorWeightCombo.getItems().get( 0 ) : tutor.getTutor().getWeight() );
         tutorVisitorCheck.setSelected( tutor != null && tutor.visitorProperty().get() );
         tutorVisiteeCheck.setSelected( tutor != null && tutor.visiteeProperty().get() );
+        tutorTitlesField.setText( tutor == null? "" : tutor.titlesProperty().get() );
     }
 
     private <S,T> List<TableColumn<S,T>> createCols( Pair<String,String>... properties ) {
