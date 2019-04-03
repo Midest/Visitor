@@ -120,7 +120,7 @@ public class VisitsSheets {
     private String getFullRegalia( Tutor tutor ) {
         return tutor.getWeight().getStatus()
                 + ( tutor.fromBosses() ? " " + tutor.getDepartment() : "" )
-                + ( tutor.getRegalia().isEmpty() ? "" : ( ", " + tutor.getRegalia()) )
+                + ( tutor.getTitles().isEmpty() ? "" : ( ", " + tutor.getTitles()) )
                 + ( "\n" )
                 + tutor.getName();
     }

@@ -8,7 +8,7 @@ public class Tutor implements Comparable<Tutor>, CharSequence{
     private Status weight;
     private boolean outerBoss;
     private boolean special;
-    private String regalia = "";
+    private String titles = "";
     private String department = "";
     private boolean visitor;
     private boolean visitee;
@@ -85,13 +85,13 @@ public class Tutor implements Comparable<Tutor>, CharSequence{
         }
     }
 
-    public Tutor( String name, Status weight, String regalia ){
-        this( name, weight, regalia, "кафедры" );
+    public Tutor( String name, Status weight, String titles ){
+        this( name, weight, titles, "кафедры" );
     }
 
-    public Tutor( String name, Status weight, String regalia, String department ){
+    public Tutor( String name, Status weight, String titles, String department ){
         this( name, weight );
-        setRegalia( regalia );
+        setTitles( titles );
         setDepartment( department );
 
     }
@@ -129,12 +129,12 @@ public class Tutor implements Comparable<Tutor>, CharSequence{
         this.weight = weight;
     }
 
-    public String getRegalia() {
-        return regalia;
+    public String getTitles() {
+        return titles;
     }
 
-    public void setRegalia( String regalia ) {
-        this.regalia = regalia;
+    public void setTitles( String titles ) {
+        this.titles = titles;
     }
 
     public String getDepartment() {

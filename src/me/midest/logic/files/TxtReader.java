@@ -44,7 +44,7 @@ public class TxtReader {
             if( l.length > 4 )
                 t.setDepartment( l[5] );
             if( l.length > 5 )
-                t.setRegalia( l[5] );
+                t.setTitles( l[5] );
             return (T) t;
         }
         else if( clazz.equals( FixedVisit.class )) {
