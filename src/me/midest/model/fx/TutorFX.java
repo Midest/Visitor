@@ -12,6 +12,7 @@ public class TutorFX {
     private Tutor tutor;
     private StringProperty name;
     private SimpleStringProperty weight;
+    private SimpleStringProperty titles;
 
     private BooleanProperty visitor;
     private BooleanProperty visitee;
@@ -20,6 +21,7 @@ public class TutorFX {
         this.tutor = tutor;
         this.name = new SimpleStringProperty( tutor.getName());
         this.weight = new SimpleStringProperty( tutor.getWeight().getStatus() );
+        this.titles = new SimpleStringProperty( tutor.getTitles() );
         this.visitor = new SimpleBooleanProperty( tutor.isVisitor() );
         this.visitee = new SimpleBooleanProperty( tutor.isVisitee() );
         this.visitor.addListener( e -> tutor.setVisitor( visitor.get() ) );
@@ -34,9 +36,18 @@ public class TutorFX {
         return weight;
     }
 
+    public StringProperty titlesProperty() {
+        return titles;
+    }
+
     public void setWeight( Status weight ) {
         this.weight.set( weight.getStatus());
         this.tutor.setWeight( weight );
+    }
+
+    public void setTitles( String titles ) {
+        this.titles.set( titles );
+        this.tutor.setTitles( titles );
     }
 
     public BooleanProperty visitorProperty() {
