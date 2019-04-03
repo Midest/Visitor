@@ -42,7 +42,7 @@ public class TxtReader {
                 return null;
             Tutor t = new Tutor( l[0], Tutor.Status.byName( l[1] ), l[2].equals( "1" ), l[3].equals( "1" ) );
             if( l.length > 4 )
-                t.setDepartment( l[5] );
+                t.setDepartment( l[4] );
             if( l.length > 5 )
                 t.setTitles( l[5] );
             return (T) t;
