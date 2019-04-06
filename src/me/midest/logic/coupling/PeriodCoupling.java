@@ -42,6 +42,7 @@ public class PeriodCoupling {
     private Set<Pair<Tutor, LocalDate>> tutorDate;
     private List<Visit> result;
     private Set<Lesson> resultLessons;
+    private Map<Tutor, Set<Lesson>> byTutor;
 
     private Set<FixedVisit> fixedVisits;
 
@@ -226,7 +227,7 @@ public class PeriodCoupling {
                         && l.getDate().equals( fv.getDate())
                         && l.getTime().strictEquals( fv.getTime())) {
                     l.setTutor( fv.getTutor() );
-                    addVisitToSchedule( new Visit( fv.getVisitor(), l ) );  //FIXME может processVisit()
+                    addVisitToSchedule( createVisit( fv.getVisitor(), l ) );  //FIXME может processVisit()
                                                                             //т.к. пока нет проверок?
                 }
             }
@@ -261,7 +262,7 @@ public class PeriodCoupling {
      * @return список всех возможных посещений
      */
     private List<Visit> findAllPossibleVisits( Set<Lesson> lessons, boolean withWeekend ) {
-        Map<Tutor, Set<Lesson>> byTutor = new HashMap<>();
+        byTutor = new HashMap<>();
         List<Visit> visits = new ArrayList<>();
         // Разбиваем пары по проводящим их преподавателям,
         // оставляя только тех, кто участвует
@@ -368,6 +369,20 @@ public class PeriodCoupling {
     private void addVisit( List<Visit> visits, Tutor visitor, Lesson lesson,
                            Map<Tutor, Set<Lesson>> lessonsForWorkRule ) {
         Visit visit = new Visit( visitor, lesson );
+        calculateOptionalSatisfaction( visit, lessonsForWorkRule );
+        visits.add( visit );
+        withoutPossibleVisits.remove( lesson.getTutor() );
+    }
+
+    /**
+     * Подсчет и внесение информации в посещение о соответствии опциональным правилам.
+     * @param visit посещение
+     * @param lessonsForWorkRule
+     */
+    private void calculateOptionalSatisfaction( Visit visit,
+                                                Map<Tutor, Set<Lesson>> lessonsForWorkRule ) {
+        Tutor visitor = visit.getVisitor();
+        Lesson lesson = visit.getVisit();
         Tutor tutor = lesson.getTutor();
         boolean isOuterRoom = isOuterRoom( lesson.getRoom());
         if( dateForVisitorIsOk( visitor, lesson ))
@@ -384,8 +399,6 @@ public class PeriodCoupling {
             visit.satisfyOptionalRule( OptionalRules.Rules.SAME_PLACE.priority() );
         if( !lessonsForWorkRule.get( visitor ).isEmpty())
             visit.satisfyOptionalRule( OptionalRules.Rules.VISITOR_WORKS.priority() );
-        visits.add( visit );
-        withoutPossibleVisits.remove( lesson.getTutor() );
     }
 
     private boolean isOuterRoom( String room ) {
@@ -512,7 +525,7 @@ public class PeriodCoupling {
                 // Значит помешало добавленное посещение.
                 // Его можно будет убрать при оптимизации.
                 if( !hasLesson( visitor, period.getByTutors().get( visitor ), lesson )) {
-                    return addVisitToSchedule( new Visit( visitor, lesson ));
+                    return addVisitToSchedule( createVisit( visitor, lesson ));
                 }
             }
         }
@@ -641,6 +654,16 @@ public class PeriodCoupling {
         return tutor.fromBosses() ?
                 count >= MIN_VISITS_PER_BOSS :
                 count >= VISITS_PER_TUTOR;
+    }
+
+    /**
+     * Создание посещения с подсчетом выполнимости дополнительных правил.
+     * @return
+     */
+    private Visit createVisit( Tutor visitor, Lesson lesson){
+        Visit v = new Visit( visitor, lesson );
+        calculateOptionalSatisfaction( v, byTutor );
+        return v;
     }
 
     /**
