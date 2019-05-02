@@ -56,15 +56,6 @@ public class TimeInterval implements Comparable<TimeInterval> {
         return new TimeInterval( bounds, true );
     }
 
-    /**
-     * Создание без добавления в множество созданных интервалов.
-     * @param bounds интервал в формате "ЧЧ:ММ-ЧЧ:ММ"
-     * @return интервал
-     */
-    public static TimeInterval createWithoutCaching( String bounds ){
-        return new TimeInterval( bounds, false );
-    }
-
     public boolean overlaps( TimeInterval that ){
         return !( ( this == EMPTY || that == EMPTY )
                 || ( this.start.isBefore( that.start ) && !this.end.isAfter( that.start ))
