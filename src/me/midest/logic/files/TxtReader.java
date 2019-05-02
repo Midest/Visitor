@@ -53,7 +53,7 @@ public class TxtReader {
                 return null;
             Tutor t = new Tutor( l[0] );
             Tutor v = new Tutor( l[1] );
-            TimeInterval ti = new TimeInterval( l[2] );
+            TimeInterval ti = TimeInterval.create( l[2] );
             LocalDate date = LocalDate.parse( l[3] );
             FixedVisit visit = new FixedVisit( t, v, ti, date );
             return (T) visit;

@@ -112,7 +112,7 @@ public class SheetStructure {
                         firstLessonColumnIndex = colIndex + 1;
                 }
                 else try{
-                    TimeInterval ti = new TimeInterval( value );
+                    TimeInterval ti = TimeInterval.create( value );
                     timeIntervalRows.putIfAbsent( ti, new HashSet<Integer>() );
                     timeIntervalRows.get( ti ).add( row.getRowNum());
                     timeRows.add( row.getRowNum());

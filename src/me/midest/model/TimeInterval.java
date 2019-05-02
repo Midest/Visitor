@@ -8,7 +8,7 @@ public class TimeInterval implements Comparable<TimeInterval> {
 
     private static Set<TimeInterval> intervalList = new LinkedHashSet<>();
 
-    public static void clear(){
+    public static void clearCache(){
         intervalList.clear();
     }
 
@@ -34,13 +34,35 @@ public class TimeInterval implements Comparable<TimeInterval> {
     public static final TimeInterval EMPTY = new TimeInterval();
     private TimeInterval(){}
 
-    public TimeInterval( String bounds ){
+    private TimeInterval( String bounds ){
+        this( bounds, true );
+    }
+
+    private TimeInterval( String bounds, boolean addToList ){
         String bound[] = bounds.trim().replaceAll( "[\\s-]+", " " ).split( " " );
         String first[] = bound[0].split( ":" );
         String second[] = bound[1].split( ":" );
         start = LocalTime.of( Integer.valueOf( first[0] ), Integer.valueOf( first[1] ) );
         end = LocalTime.of(  Integer.valueOf( second[0] ), Integer.valueOf( second[1] )  );
-        intervalList.add( this );
+        if( start.isAfter( end )){ // normalize order
+            LocalTime t = end;
+            end = start;
+            start = t;
+        }
+        if( addToList ) intervalList.add( this );
+    }
+
+    public static TimeInterval create( String bounds ){
+        return new TimeInterval( bounds, true );
+    }
+
+    /**
+     * Создание без добавления в множество созданных интервалов.
+     * @param bounds интервал в формате "ЧЧ:ММ-ЧЧ:ММ"
+     * @return интервал
+     */
+    public static TimeInterval createWithoutCaching( String bounds ){
+        return new TimeInterval( bounds, false );
     }
 
     public boolean overlaps( TimeInterval that ){

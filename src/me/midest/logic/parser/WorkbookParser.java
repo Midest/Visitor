@@ -93,7 +93,7 @@ public class WorkbookParser {
                     } else if( cell.getColumnIndex() == getExcelColumnIndex( "B" ) ) {
                         String cellValue = cell.getStringCellValue();
                         if( cellValue != null && cellValue.length() > 0 ) try {
-                            currentPairTime = new TimeInterval( cellValue );
+                            currentPairTime = TimeInterval.create( cellValue );
                         } catch( Exception e ) {
                             currentPairTime = null;
                         }

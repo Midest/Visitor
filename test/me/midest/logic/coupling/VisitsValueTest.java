@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 
 public class VisitsValueTest {
-    private TimeInterval ti = new TimeInterval( "09:00-10:40" );
+    private TimeInterval ti = TimeInterval.create( "09:00-10:40" );
 
     @Test
     public void simpleTest(){

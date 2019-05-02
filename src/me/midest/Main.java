@@ -210,7 +210,7 @@ public class Main extends Application {
      */
     private void initServices( String fileName, String year, Term term ) throws Exception {
         initialized = false;
-        TimeInterval.clear();
+        TimeInterval.clearCache();
         coupler = new PeriodCoupling();
         checker = new ScheduleChecker();
         optimizer = new ScheduleOptimizer();

@@ -10,7 +10,7 @@ import java.util.Arrays;
 import static org.junit.Assert.*;
 
 public class VisitsMetricsTest {
-    private TimeInterval ti = new TimeInterval( "09:00-10:40" );
+    private TimeInterval ti = TimeInterval.create( "09:00-10:40" );
     private Visit v21,v31,v32,v23,v23_2;
     private Long v21_31, v21_23, v21_32,v23_23_2;
     @Before
