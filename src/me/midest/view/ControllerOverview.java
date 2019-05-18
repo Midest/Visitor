@@ -11,7 +11,7 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.util.Pair;
 import me.midest.Main;
-import me.midest.logic.coupling.PeriodCoupling;
+import me.midest.logic.coupling.TermCoupling;
 import me.midest.logic.coupling.TheoreticalVisitsValue;
 import me.midest.logic.coupling.VisitsValue;
 import me.midest.logic.files.TxtReader;
@@ -182,9 +182,9 @@ public class ControllerOverview {
                 .map( VisitFX::getVisit )
                 .collect( Collectors.toList());
         String secondFeasibility = main.getChecker().feasibilityCheck( visitsSecond ).toString();
-        String secondCompleteness = main.getChecker().completenessCheck( visitsSecond, tutors, PeriodCoupling.VISITS_PER_TUTOR, PeriodCoupling.MIN_VISITS_PER_BOSS ).toString();
+        String secondCompleteness = main.getChecker().completenessCheck( visitsSecond, tutors, TermCoupling.VISITS_PER_TUTOR, TermCoupling.MIN_VISITS_PER_BOSS ).toString();
         String targetFeasibility = main.getChecker().feasibilityCheck( visitsTarget ).toString();
-        String targetCompleteness = main.getChecker().completenessCheck( visitsTarget, tutors, PeriodCoupling.VISITS_PER_TUTOR, PeriodCoupling.MIN_VISITS_PER_BOSS ).toString();
+        String targetCompleteness = main.getChecker().completenessCheck( visitsTarget, tutors, TermCoupling.VISITS_PER_TUTOR, TermCoupling.MIN_VISITS_PER_BOSS ).toString();
         checkLabelSecond.setText( secondFeasibility + ". " + secondCompleteness + ". " );
         checkLabelTarget.setText( targetFeasibility + ". " + targetCompleteness + ". " );
     }

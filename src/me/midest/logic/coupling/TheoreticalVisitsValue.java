@@ -88,8 +88,8 @@ public class TheoreticalVisitsValue {
      * @return значение снижения верхней границы целевой функции для данного числа посещающих
      */
     private static double visitorsCut( int weight, int bossVisitors, int otherVisitors, int visitsCount ){
-        int vpt = PeriodCoupling.VISITS_PER_TUTOR;
-        int vpb = PeriodCoupling.MIN_VISITS_PER_BOSS;
+        int vpt = TermCoupling.VISITS_PER_TUTOR;
+        int vpb = TermCoupling.MIN_VISITS_PER_BOSS;
         if( vpb < vpt )
             return 0;
         int minVisits = bossVisitors * vpb + otherVisitors * vpt;

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
 
-public class Period {
+public class Term {
 
     private Map<Tutor, Set<Lesson>> byTutors;
     private Map<LocalDate, Set<Lesson>> byDates;
@@ -12,7 +12,7 @@ public class Period {
 
     private Set<Month> months;
 
-    public Period(){
+    public Term(){
         byTutors = new HashMap<>();
         byDates = new HashMap<>();
         allLessons = new HashSet<>();

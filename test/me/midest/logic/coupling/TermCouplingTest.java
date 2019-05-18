@@ -7,13 +7,13 @@ import org.junit.Test;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PeriodCouplingTest {
+public class TermCouplingTest {
 
-    PeriodCoupling coupler;
+    TermCoupling coupler;
 
     @Before
     public void setUp(){
-        coupler = new PeriodCoupling();
+        coupler = new TermCoupling();
 
         // Внешние аудитории
         Set<String> outerRooms = new HashSet<>();

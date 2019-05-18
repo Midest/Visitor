@@ -8,7 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import me.midest.logic.coupling.PeriodCoupling;
+import me.midest.logic.coupling.TermCoupling;
 import me.midest.logic.coupling.ScheduleChecker;
 import me.midest.logic.coupling.ScheduleOptimizer;
 import me.midest.logic.files.TxtReader;
@@ -36,7 +36,7 @@ public class Main extends Application {
     private BorderPane rootLayout;
     private ControllerOverview controller;
 
-    private PeriodCoupling coupler;
+    private TermCoupling coupler;
     private WorkbookParser parser;
     private ScheduleChecker checker;
     private ScheduleOptimizer optimizer;
@@ -150,7 +150,7 @@ public class Main extends Application {
 
         // Оптимизируем расписание
         List<Visit> result = optimizer.optimize( rawResult, tutorsList, checker, fixed,
-                PeriodCoupling.VISITS_PER_TUTOR, PeriodCoupling.MIN_VISITS_PER_BOSS );
+                TermCoupling.VISITS_PER_TUTOR, TermCoupling.MIN_VISITS_PER_BOSS );
 
         // Очищаем списки
         source.clear();
@@ -186,7 +186,7 @@ public class Main extends Application {
         List<Visit> visits = target.parallelStream().map( VisitFX::getVisit ).collect( Collectors.toList());
         List<Tutor> tutorsList = tutors.parallelStream().map( TutorFX::getTutor ).collect( Collectors.toList());
         List<Visit> newResult = optimizer.optimize( visits, tutorsList, checker, fixed,
-                PeriodCoupling.VISITS_PER_TUTOR, PeriodCoupling.MIN_VISITS_PER_BOSS );
+                TermCoupling.VISITS_PER_TUTOR, TermCoupling.MIN_VISITS_PER_BOSS );
         safeRemoval( visits, newResult );
         List<VisitFX> toMove = visits.parallelStream().map( VisitFX::new ).collect( Collectors.toList());
         safeRemoval( target, toMove );
@@ -211,7 +211,7 @@ public class Main extends Application {
     private void initServices( String fileName, String year, Term term ) throws Exception {
         initialized = false;
         TimeInterval.clearCache();
-        coupler = new PeriodCoupling();
+        coupler = new TermCoupling();
         checker = new ScheduleChecker();
         optimizer = new ScheduleOptimizer();
 

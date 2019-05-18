@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PeriodCoupling {
+public class TermCoupling {
 
     /** Минимум посещений начальнику. */
     public static final int MIN_VISITS_PER_BOSS = 10;
@@ -17,7 +17,7 @@ public class PeriodCoupling {
     public static final int VISITS_PER_TUTOR = 1;
 
     /** Расписание. */
-    private Period period;
+    private Term term;
     /** Все возможные посещения всех пар по датам. */
     private Map<LocalDate, List<Visit>> possibleVisits;
     /** Список всех, кто может посещать, включая начальников. */
@@ -46,7 +46,7 @@ public class PeriodCoupling {
 
     private Set<FixedVisit> fixedVisits;
 
-    public PeriodCoupling(){
+    public TermCoupling(){
         possibleVisits = new HashMap<>();
 
         possibleVisitors = new HashSet<>();
@@ -66,8 +66,8 @@ public class PeriodCoupling {
         fixedVisits = new HashSet<>();
     }
 
-    public Period getPeriod() {
-        return period;
+    public Term getTerm() {
+        return term;
     }
 
     public Map<LocalDate, List<Visit>> getPossibleVisits() {
@@ -111,7 +111,7 @@ public class PeriodCoupling {
      */
     private void checkTutorsLists() {
         if( toVisit.isEmpty()) {
-            Iterator<Tutor> tutors = period.getByTutors().keySet().iterator();
+            Iterator<Tutor> tutors = term.getByTutors().keySet().iterator();
             while( tutors.hasNext() ) {
                 Tutor tutor = tutors.next();
                 if( !outerTutors.contains( tutor ))
@@ -119,7 +119,7 @@ public class PeriodCoupling {
             }
         }
         if( possibleVisitors.isEmpty()){
-            Iterator<Tutor> tutors = period.getByTutors().keySet().iterator();
+            Iterator<Tutor> tutors = term.getByTutors().keySet().iterator();
             while( tutors.hasNext() ) {
                 Tutor tutor = tutors.next();
                 if( !outerTutors.contains( tutor ))
@@ -134,13 +134,13 @@ public class PeriodCoupling {
      * Составление расписания посещений.
      * @return расписание в виде множества
      * @throws Exception
-     * @param period
+     * @param term
      * @param withWeekends
      */
-    public Collection<Visit> generateSchedule( Period period, boolean withWeekends ) throws Exception{
+    public Collection<Visit> generateSchedule( Term term, boolean withWeekends ) throws Exception{
         clearLists();
-        removeTutorsWithNoLessons( period );
-        findAllPossibleVisitsForPeriod( period, withWeekends );
+        removeTutorsWithNoLessons( term );
+        findAllPossibleVisitsForPeriod( term, withWeekends );
         fillTempSets();
         fillFixedVisits();
         List<Visit> all = new ArrayList<>();
@@ -208,11 +208,11 @@ public class PeriodCoupling {
         tutorDate.clear();
     }
 
-    private void removeTutorsWithNoLessons( Period period ) {
+    private void removeTutorsWithNoLessons( Term term ) {
         Set<Tutor> toRemove = new HashSet<>();
         toVisit.stream().forEach( tutor -> {
-            if( period.getByTutors().get( tutor ) == null
-                    || period.getByTutors().get( tutor ).isEmpty()) toRemove.add( tutor );
+            if( term.getByTutors().get( tutor ) == null
+                    || term.getByTutors().get( tutor ).isEmpty()) toRemove.add( tutor );
         });
         toVisit.removeAll( toRemove );
     }
@@ -222,7 +222,7 @@ public class PeriodCoupling {
      */
     private void fillFixedVisits() {
         for( FixedVisit fv : fixedVisits ){
-            for( Lesson l : period.getAllLessons()){
+            for( Lesson l : term.getAllLessons()){
                 if( l.getTutor().equals( fv.getTutor())
                         && l.getDate().equals( fv.getDate())
                         && l.getTime().strictEquals( fv.getTime())) {
@@ -236,14 +236,14 @@ public class PeriodCoupling {
 
     /**
      * Составление всех возможных вариантов посещений.
-     * @param period пары некоторого {@link Period периода}
+     * @param term пары некоторого {@link Term периода}
      * @param withWeekend рассматривать ли пары в выходные дни
      */
-    protected void findAllPossibleVisitsForPeriod( Period period, boolean withWeekend ){
-        this.period = period;
+    protected void findAllPossibleVisitsForPeriod( Term term, boolean withWeekend ){
+        this.term = term;
         checkTutorsLists();
         possibleVisits.clear();
-        for( Map.Entry<LocalDate, Set<Lesson>> entry : period.getByDates().entrySet())
+        for( Map.Entry<LocalDate, Set<Lesson>> entry : term.getByDates().entrySet())
             possibleVisits.put( entry.getKey(), findAllPossibleVisits( entry.getValue(), withWeekend ) );
     }
 
@@ -517,14 +517,14 @@ public class PeriodCoupling {
             if( t.fromBosses()) bosses.add( t );
 
         // Заполняем начальниками без проверки наличия у них посещений
-        Set<Lesson> lessons = period.getByTutors().get( tutor );
+        Set<Lesson> lessons = term.getByTutors().get( tutor );
         for( Lesson lesson : lessons ){
             for( Tutor visitor : bosses ){
                 // Нет проверки на наличие посещений у посещающего, что логично,
                 // учитывая, что это последняя попытка добавить.
                 // Значит помешало добавленное посещение.
                 // Его можно будет убрать при оптимизации.
-                if( !hasLesson( visitor, period.getByTutors().get( visitor ), lesson )) {
+                if( !hasLesson( visitor, term.getByTutors().get( visitor ), lesson )) {
                     return addVisitToSchedule( createVisit( visitor, lesson ));
                 }
             }

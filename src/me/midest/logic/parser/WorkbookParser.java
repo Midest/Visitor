@@ -2,7 +2,7 @@ package me.midest.logic.parser;
 
 import me.midest.model.Lesson;
 import me.midest.model.Lesson.SourceType;
-import me.midest.model.Period;
+import me.midest.model.Term;
 import me.midest.model.TimeInterval;
 import me.midest.model.Tutor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -19,13 +19,13 @@ public class WorkbookParser {
     /** Вспомогательная карта привязки к столбцам дат. */
     private Map<Integer, LocalDate> currentDates;
     private TimeInterval currentPairTime;
-    private Period result;
+    private Term result;
     private Integer year;
     private Set<Tutor> tutors;
 
     public WorkbookParser( String year ){
         this.year = Integer.valueOf( year );
-        result = new Period();
+        result = new Term();
         currentDates = new HashMap<>();
         tutors = new HashSet<>();
     }
@@ -36,7 +36,7 @@ public class WorkbookParser {
         }
     }
 
-    public Period getResult() {
+    public Term getResult() {
         return result;
     }
 
