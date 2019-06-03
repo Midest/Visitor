@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import me.midest.model.Tutor;
 import me.midest.model.Tutor.Status;
+import me.midest.model.time.TimePeriod;
 
 public class TutorFX {
 
@@ -17,6 +18,9 @@ public class TutorFX {
     private BooleanProperty visitor;
     private BooleanProperty visitee;
 
+    private TimePeriod unwantedIntervals;
+    private TimePeriod unsuitableIntervals;
+
     public TutorFX( Tutor tutor ){
         this.tutor = tutor;
         this.name = new SimpleStringProperty( tutor.getName());
@@ -26,6 +30,8 @@ public class TutorFX {
         this.visitee = new SimpleBooleanProperty( tutor.isVisitee() );
         this.visitor.addListener( e -> tutor.setVisitor( visitor.get() ) );
         this.visitee.addListener( e -> tutor.setVisitee( visitee.get() ) );
+        this.unwantedIntervals = new TimePeriod();
+        this.unsuitableIntervals = new TimePeriod();
     }
 
     public StringProperty nameProperty() {
@@ -60,6 +66,14 @@ public class TutorFX {
 
     public Tutor getTutor() {
         return tutor;
+    }
+
+    public TimePeriod getUnwantedIntervals() {
+        return unwantedIntervals;
+    }
+
+    public TimePeriod getUnsuitableIntervals() {
+        return unsuitableIntervals;
     }
 
     @Override
