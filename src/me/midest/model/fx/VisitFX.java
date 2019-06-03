@@ -49,7 +49,7 @@ public class VisitFX implements EqualsGradations {
         }
         this.optionals = new SimpleStringProperty( new StringBuilder()
                 .append( opt.toString(), 0, 1 )
-                .append( opt.toString(), 2,  5 )
+                .append( opt.toString(), 2,  6 )
                 .reverse().toString() );
     }
 
