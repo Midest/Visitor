@@ -144,6 +144,10 @@ public class Main extends Application {
         Collection<Visit> fixed = second.parallelStream().map( VisitFX::getVisit ).collect( Collectors.toList());
         coupler.setFixedVisits( fixed );
         setCouplerTutors( tutorsList );
+        tutors.forEach( t ->{
+            coupler.setUnsuitableIntervalsForTutor( t.getTutor(), t.getUnsuitableIntervals() );
+            coupler.setUnwantedIntervalsForTutor( t.getTutor(), t.getUnwantedIntervals() );
+        });
 
         // Генерируем расписание
         Collection<Visit> rawResult = coupler.generateSchedule( parser.getResult(), true );

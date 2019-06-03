@@ -2,6 +2,7 @@ package me.midest.logic.coupling;
 
 import javafx.util.Pair;
 import me.midest.model.*;
+import me.midest.model.time.TimePeriod;
 
 import javax.swing.*;
 import java.time.DayOfWeek;
@@ -45,6 +46,8 @@ public class TermCoupling {
     private Map<Tutor, Set<Lesson>> byTutor;
 
     private Set<FixedVisit> fixedVisits;
+    private Map<Tutor, TimePeriod> unwantedIntervals;
+    private Map<Tutor, TimePeriod> unsuitableIntervals;
 
     public TermCoupling(){
         possibleVisits = new HashMap<>();
@@ -64,6 +67,9 @@ public class TermCoupling {
         resultLessons = new HashSet<>();
 
         fixedVisits = new HashSet<>();
+
+        unwantedIntervals = new HashMap<>();
+        unsuitableIntervals = new HashMap<>();
     }
 
     public Term getTerm() {
@@ -104,6 +110,14 @@ public class TermCoupling {
         this.fixedVisits.addAll( visits.parallelStream()
                 .map( v -> new FixedVisit( v.getVisit().getTutor(), v.getVisitor(), v.getVisit().getTime(), v.getVisit().getDate()))
                 .collect( Collectors.toList()));
+    }
+
+    public void setUnsuitableIntervalsForTutor( Tutor t, TimePeriod intervals ){
+        unsuitableIntervals.put( t, intervals );
+    }
+
+    public void setUnwantedIntervalsForTutor( Tutor t, TimePeriod intervals ){
+        unwantedIntervals.put( t, intervals );
     }
 
      /**
@@ -281,7 +295,8 @@ public class TermCoupling {
                 for( Tutor visitor : byTutor.keySet()){
                     if( possibleVisitors.contains( visitor )
                             && !visitor.equals( tutor )){ // Если преподаватель подходит...
-                        if( !hasLesson( visitor, byTutor.get( visitor ), lesson )){ // ...и у него нет пары...
+                        if( dateForVisitorIsSuitable( visitor, lesson ) && // ...и не занят...
+                                !hasLesson( visitor, byTutor.get( visitor ), lesson )){ // ...и у него нет пары...
                             addVisit( visits, visitor, lesson, byTutor );
                         }
                     }
@@ -304,8 +319,14 @@ public class TermCoupling {
     }
 
     /** Проверка ограничений по датам для посещающих */
+    private boolean dateForVisitorIsSuitable( Tutor visitor, Lesson lesson ) {
+        TimePeriod tp = unsuitableIntervals.get( visitor );
+        return tp == null || !tp.contains( lesson.getDate(), lesson.getTime());
+    }
+    /** Проверка ограничений по датам для посещающих */
     private boolean dateForVisitorIsOk( Tutor visitor, Lesson lesson ) {
-        return true;
+        TimePeriod tp = unwantedIntervals.get( visitor );
+        return tp == null || !tp.contains( lesson.getDate(), lesson.getTime());
     }
 
     /**
@@ -524,7 +545,8 @@ public class TermCoupling {
                 // учитывая, что это последняя попытка добавить.
                 // Значит помешало добавленное посещение.
                 // Его можно будет убрать при оптимизации.
-                if( !hasLesson( visitor, term.getByTutors().get( visitor ), lesson )) {
+                if( dateForVisitorIsSuitable( visitor, lesson ) && // ...и не занят...
+                     !hasLesson( visitor, term.getByTutors().get( visitor ), lesson )) {
                     return addVisitToSchedule( createVisit( visitor, lesson ));
                 }
             }
@@ -622,8 +644,7 @@ public class TermCoupling {
             if( perVisitor == null ) perVisitor = 0;
             resultLessons.add( visit.getVisit() );
             tutorDate.add( new Pair<>( tutor, visit.getVisit().getDate() ) );
-            if( dateForVisitorIsOk( visitor, visit.getVisit() ))
-                visitorVisits.put( visitor, perVisitor + 1 );
+            visitorVisits.put( visitor, perVisitor + 1 );
             visitedTutors.add( tutor );
             return true;
         }

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<?import javafx.scene.layout.HBox?>
+<?import me.midest.view.controls.SimpleTimeField?>
+<?import java.time.LocalDate?>
+<?import javafx.collections.FXCollections?>
+<?import me.midest.model.time.PeriodUnit?>
+<VBox alignment="CENTER_LEFT" prefHeight="150.0" prefWidth="200.0" spacing="5"
+
+      xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
+    <Text text="Интервал и первая дата" style="-fx-font-size:18"/>
+    <HBox alignment="CENTER">
+        <SimpleTimeField fx:id="timeStart" prefWidth="55" maxWidth="85" HBox.hgrow="NEVER">
+            <HBox.margin>
+                <Insets right="3.0" />
+            </HBox.margin>
+            <font>
+                <Font size="14.0" />
+            </font>
+        </SimpleTimeField>
+        <Text text="–" style="-fx-font-size:18" HBox.hgrow="NEVER"/>
+        <SimpleTimeField fx:id="timeEnd" prefWidth="55" maxWidth="85" HBox.hgrow="NEVER">
+            <HBox.margin>
+                <Insets left="3.0" />
+            </HBox.margin>
+            <font>
+                <Font size="14.0" />
+            </font>
+        </SimpleTimeField>
+        <Label textAlignment="CENTER" text="начиная с даты:" style="-fx-font-size:16" prefWidth="120">
+            <HBox.margin>
+                <Insets left="5.0" right="5.0" />
+            </HBox.margin>
+        </Label>
+        <DatePicker fx:id="firstPicker" prefWidth="125" maxWidth="125" HBox.hgrow="NEVER" style="-fx-font-size:14">
+            <HBox.margin>
+                <Insets left="3.0" />
+            </HBox.margin>
+            <value>
+                <LocalDate fx:factory="now"/>
+            </value>
+        </DatePicker>
+    </HBox>
+    <Text text="Ограничения по датам" style="-fx-font-size:18"/>
+    <HBox alignment="CENTER">
+        <DatePicker fx:id="dateFromPicker" prefWidth="125" maxWidth="125" HBox.hgrow="NEVER" style="-fx-font-size:14">
+            <HBox.margin>
+                <Insets left="3.0" right="3.0"/>
+            </HBox.margin>
+            <value>
+                <LocalDate fx:factory="now"/>
+            </value>
+        </DatePicker>
+        <Text text="–" style="-fx-font-size:18" HBox.hgrow="NEVER"/>
+        <DatePicker fx:id="dateToPicker" prefWidth="125" maxWidth="125" HBox.hgrow="NEVER" style="-fx-font-size:14">
+            <HBox.margin>
+                <Insets left="3.0" right="3.0"/>
+            </HBox.margin>
+            <value>
+                <LocalDate fx:factory="now"/>
+            </value>
+        </DatePicker>
+    </HBox>
+    <Text text="Повторения" style="-fx-font-size:18"/>
+    <HBox alignment="CENTER">
+        <Text text="Каждая (-ый) " style="-fx-font-size:14" HBox.hgrow="NEVER"/>
+        <Spinner fx:id="durationSpinner" prefWidth="75" maxWidth="75" HBox.hgrow="NEVER" style="-fx-font-size:14" editable="true">
+            <valueFactory>
+                <SpinnerValueFactory.IntegerSpinnerValueFactory min="1" max="365" initialValue="1"/>
+            </valueFactory>
+        </Spinner>
+        <Text text=" " style="-fx-font-size:18" HBox.hgrow="NEVER"/>
+        <ComboBox fx:id="timeUnitCheck" style="-fx-font-size:14">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <PeriodUnit fx:value="DAYS" />
+                    <PeriodUnit fx:value="WEEKS" />
+                    <PeriodUnit fx:value="MONTHS"/>
+                </FXCollections>
+            </items>
+            <value>
+                <PeriodUnit fx:value="DAYS"/>
+            </value>
+        </ComboBox>
+    </HBox>
+</VBox>
