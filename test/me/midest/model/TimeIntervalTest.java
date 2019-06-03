@@ -32,6 +32,21 @@ public class TimeIntervalTest {
     }
 
     @Test
+    public void normalizationOnSet(){
+        LocalTime otherTime = LocalTime.of( 15, 0 );
+
+        LocalTime endTime = LocalTime.of( 16,0 );
+        ti.setStart( endTime );
+        assertEquals( otherTime, ti.getStart());
+        assertEquals( endTime, ti.getEnd());
+
+        LocalTime startTime = LocalTime.of( 14,0 );
+        ti.setEnd( startTime );
+        assertEquals( startTime, ti.getStart());
+        assertEquals( otherTime, ti.getEnd());
+    }
+
+    @Test
     public void creationTest(){
         assertEquals( LocalTime.of( 10,0 ), ti.getStart() );
         assertEquals( LocalTime.of( 15,0 ), ti.getEnd() );
