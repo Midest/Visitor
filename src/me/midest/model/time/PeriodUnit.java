@@ -5,7 +5,7 @@ import java.time.temporal.ChronoUnit;
 public enum PeriodUnit {
     DAYS( "день", ChronoUnit.DAYS ),
     WEEKS( "неделя", ChronoUnit.WEEKS ),
-    MONTHS( "месяц", ChronoUnit.WEEKS );
+    MONTHS( "месяц", ChronoUnit.MONTHS );
 
     private String text;
     private ChronoUnit chronoUnit;
