@@ -50,6 +50,11 @@ public class TimePeriod {
         periodicals.clear();
     }
 
+    public boolean contains( LocalDate date, TimeInterval timeInterval, LocalDate defaultFrom, LocalDate defaultTo ){
+        setBoundsToUnboundPeriodicals( defaultFrom, defaultTo );
+        return contains( date, timeInterval );
+    }
+
     public boolean contains( LocalDate date, TimeInterval timeInterval ){
         convertPeriodicals();
         for( Interval i : intervals )
@@ -69,6 +74,12 @@ public class TimePeriod {
     public Collection<Interval> getAllAsIntervals(){
         convertPeriodicals();
         return intervals;
+    }
+
+    private void setBoundsToUnboundPeriodicals( LocalDate from, LocalDate to ){
+        for( Periodical p : periodicals )
+            if( p.noDateBounds())
+                p.setDates( from, to );
     }
 
     private void convertPeriodicals(){

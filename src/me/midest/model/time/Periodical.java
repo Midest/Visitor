@@ -59,7 +59,7 @@ public class Periodical extends Interval {
 
     /**
      * Получение интервалов в соответствии с имеющимися параметрами.
-     * Если нет дат, отрицатльная периодичность или не указана
+     * Если нет дат, отрицательная периодичность или не указана
      * единица времени для периоды, возвращает <code>null</code>.
      * @return список интервалов, соответствующих этому экземпляру {@link Periodical}.
      */
@@ -86,6 +86,11 @@ public class Periodical extends Interval {
     @Override
     public boolean isEmpty() {
         return super.isEmpty() && ( first == null || unit == null || duration < 0);
+    }
+
+    public boolean noDateBounds(){
+        return first.equals( getDateFrom())
+                && first.equals( getDateTo());
     }
 
     /**

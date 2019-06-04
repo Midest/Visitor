@@ -49,6 +49,9 @@ public class TermCoupling {
     private Map<Tutor, TimePeriod> unwantedIntervals;
     private Map<Tutor, TimePeriod> unsuitableIntervals;
 
+    private LocalDate firstDate;
+    private LocalDate lastDate;
+
     public TermCoupling(){
         possibleVisits = new HashMap<>();
 
@@ -154,6 +157,7 @@ public class TermCoupling {
     public Collection<Visit> generateSchedule( Term term, boolean withWeekends ) throws Exception{
         clearLists();
         removeTutorsWithNoLessons( term );
+        setFirstAndLastDates( term );
         findAllPossibleVisitsForPeriod( term, withWeekends );
         fillTempSets();
         fillFixedVisits();
@@ -229,6 +233,13 @@ public class TermCoupling {
                     || term.getByTutors().get( tutor ).isEmpty()) toRemove.add( tutor );
         });
         toVisit.removeAll( toRemove );
+    }
+
+    private void setFirstAndLastDates( Term term ){
+        if( term.getByDates().isEmpty())
+            return;
+        firstDate = term.getByDates().keySet().stream().min( Comparator.naturalOrder()).get();
+        lastDate = term.getByDates().keySet().stream().max( Comparator.naturalOrder()).get();
     }
 
     /**
@@ -321,12 +332,12 @@ public class TermCoupling {
     /** Проверка ограничений по датам для посещающих */
     private boolean dateForVisitorIsSuitable( Tutor visitor, Lesson lesson ) {
         TimePeriod tp = unsuitableIntervals.get( visitor );
-        return tp == null || !tp.contains( lesson.getDate(), lesson.getTime());
+        return tp == null || !tp.contains( lesson.getDate(), lesson.getTime(), firstDate, lastDate );
     }
     /** Проверка ограничений по датам для посещающих */
     private boolean dateForVisitorIsOk( Tutor visitor, Lesson lesson ) {
         TimePeriod tp = unwantedIntervals.get( visitor );
-        return tp == null || !tp.contains( lesson.getDate(), lesson.getTime());
+        return tp == null || !tp.contains( lesson.getDate(), lesson.getTime(), firstDate, lastDate );
     }
 
     /**
