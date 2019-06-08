@@ -112,8 +112,13 @@ public class Interval extends TimeInterval {
     public boolean equals( Object other ) {
         if( this == other ) return true;
         if( other == null ) return false;
-        if( !(other instanceof Interval )) return false;
+        if( !(Interval.class.equals( other.getClass())))
+            return false;
         final Interval that = (Interval)other;
+        return equals( that );
+    }
+
+    protected boolean equals( Interval that ){
         if( !this.strictEquals( that ))
             return false;
         if( this.hasDate() &&

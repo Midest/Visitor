@@ -123,9 +123,10 @@ public class Periodical extends Interval {
     public boolean equals( Object other ) {
         if( this == other ) return true;
         if( other == null ) return false;
-        if( !(other instanceof Periodical )) return false;
+        if( !(Periodical.class.equals( other.getClass() )))
+            return false;
         final Periodical that = (Periodical)other;
-        if( !super.equals( other ))
+        if( !super.equals( (Interval)other ))
             return false;
         if( this.hasDate() && !this.first.equals( that.first ))
             return false;

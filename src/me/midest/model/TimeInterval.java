@@ -101,7 +101,8 @@ public class TimeInterval implements Comparable<TimeInterval> {
     public boolean equals( Object other ) {
         if( this == other ) return true;
         if( other == null ) return false;
-        if( !(other instanceof TimeInterval )) return false;
+        if( !(TimeInterval.class.equals( other.getClass())))
+            return false;
         final TimeInterval that = (TimeInterval)other;
         return this.overlaps( that );
     }
