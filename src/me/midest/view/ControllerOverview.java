@@ -40,6 +40,7 @@ import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.Wizard.LinearFlow;
 import org.controlsfx.dialog.WizardPane;
+import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.tools.ValueExtractor;
 
 import java.io.File;
@@ -96,6 +97,10 @@ public class ControllerOverview {
     private Button saveSchedule;
     @FXML
     private Button saveTutor;
+    @FXML
+    private Button removeUnwantedInterval;
+    @FXML
+    private Button removeUnsuitableInterval;
     @FXML
     private ListView<Interval> unwantedIntervalList;
     @FXML
@@ -184,9 +189,23 @@ public class ControllerOverview {
                 tp = selected.getUnsuitableIntervals();
                 tp.clear();
                 unsuitableIntervalList.getItems().forEach( tp::add );
+                //FIXME
             }
         });
 
+        FontAwesome fa = new FontAwesome();
+        removeUnsuitableInterval.setGraphic( fa.create( FontAwesome.Glyph.REMOVE ) );
+        removeUnwantedInterval.setGraphic( fa.create( FontAwesome.Glyph.REMOVE ) );
+        unsuitableIntervalList.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
+        unwantedIntervalList.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
+        removeUnsuitableInterval.setOnAction( e ->
+                unsuitableIntervalList.getItems().removeAll(
+                        unsuitableIntervalList.getSelectionModel().getSelectedItems())
+        );
+        removeUnwantedInterval.setOnAction( e ->
+                unwantedIntervalList.getItems().removeAll(
+                        unwantedIntervalList.getSelectionModel().getSelectedItems())
+        );
 
         ValueExtractor.addValueExtractor( n -> n instanceof Spinner, ta -> ((Spinner)ta).getValue());
         ValueExtractor.addValueExtractor( n -> n instanceof ToggleSwitch, ta -> ((ToggleSwitch)ta).isSelected());

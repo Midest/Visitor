@@ -182,14 +182,16 @@
                                              <CheckBox fx:id="tutorVisitorCheck" disable="true"  mnemonicParsing="false" text="отметьте, если преподаватель может посещать занятия" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                              <CheckBox fx:id="tutorVisiteeCheck" disable="true"  mnemonicParsing="false" text="отметьте, если занятия преподавателя нужно посетить" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                              <TextField fx:id="tutorTitlesField" disable="true"  GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-                                             <Label text="Непригодное для посещающего время" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="5" />
+                                             <Button fx:id="removeUnsuitableInterval" GridPane.halignment="LEFT" GridPane.rowIndex="5"/>
+                                             <Label text="Непригодное для посещающего время" GridPane.halignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                              <ListView fx:id="unsuitableIntervalList" GridPane.columnSpan="2" GridPane.rowIndex="6" GridPane.halignment="CENTER" GridPane.vgrow="ALWAYS"
                                                        prefHeight="700" maxHeight="Infinity" minHeight="300">
                                                 <placeholder>
                                                    <Label textAlignment="CENTER" text="Непригодное для посещающего время"/>
                                                 </placeholder>
                                              </ListView>
-                                             <Label text="Нежелательное для посещающего время" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="7" />
+                                             <Button fx:id="removeUnwantedInterval" GridPane.halignment="LEFT" GridPane.rowIndex="7"/>
+                                             <Label text="Нежелательное для посещающего время" GridPane.halignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                                              <ListView fx:id="unwantedIntervalList" GridPane.columnSpan="2" GridPane.rowIndex="8" GridPane.halignment="CENTER" GridPane.vgrow="ALWAYS"
                                                        prefHeight="700" maxHeight="Infinity" minHeight="300">
                                                 <placeholder>
