@@ -155,7 +155,7 @@ public class Periodical extends Interval {
                 super.toString().trim() + " ("//"\n("
                 + ( first == null ? "" : "с " + df.format( first ))
                 + ( duration < 0 ? "" :
-                        ( unit == null ? "" : " каждый " + duration + " " + unit.toString()))
+                        ( unit == null ? "" : " кажд. " + duration + " " + unit.toString()))
                 + ")";
     }
 }
