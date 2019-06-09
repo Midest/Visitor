@@ -91,6 +91,7 @@
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="0.0" />
                                  </HBox.margin>
+                                 <tooltip><Tooltip text="Загрузить файл с занятостью преподавателей"/></tooltip>
                               </Button>
                               <Label prefWidth="1000.0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0">
                                  <GridPane.margin>
@@ -101,17 +102,20 @@
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="0.0" />
                                  </HBox.margin>
+                                 <tooltip><Tooltip text="Пересоздать расписание на основе загруженного расписания"/></tooltip>
                               </Button>
                               <Button id="optimizeSchedule" fx:id="optimizeSchedule" mnemonicParsing="false" prefHeight="25.0" minWidth="250.0" prefWidth="300.0" text="Оптимизировать расписание посещений" textAlignment="CENTER">
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="0.0" />
                                  </HBox.margin>
+                                 <tooltip><Tooltip text="Оптимизировать имеющееся расписание"/></tooltip>
                               </Button>
                               <Button id="computeRating" fx:id="computeRating" mnemonicParsing="false"
                                       prefHeight="25.0" minWidth="250.0" prefWidth="300.0" text="Пересчитать и проверить" textAlignment="CENTER">
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="0.0" />
                                  </HBox.margin>
+                                 <tooltip><Tooltip text="Пересчитать рейтинг, проверить непротиворечивость и полноту расписания"/></tooltip>
                               </Button>
                               <Label prefWidth="1000.0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0">
                                  <GridPane.margin>
@@ -125,6 +129,7 @@
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="0.0" />
                                  </HBox.margin>
+                                 <tooltip><Tooltip text="Сохранить таблицу посещений и листы контроля"/></tooltip>
                               </Button>
                            </children>
                         </HBox>
@@ -182,7 +187,9 @@
                                        <CheckBox fx:id="tutorVisitorCheck" disable="true"  mnemonicParsing="false" text="отметьте, если преподаватель может посещать занятия" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                        <CheckBox fx:id="tutorVisiteeCheck" disable="true"  mnemonicParsing="false" text="отметьте, если занятия преподавателя нужно посетить" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                        <TextField fx:id="tutorTitlesField" disable="true"  GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-                                       <Button fx:id="removeUnsuitableInterval" GridPane.halignment="LEFT" GridPane.rowIndex="5"/>
+                                       <Button fx:id="removeUnsuitableInterval" GridPane.halignment="LEFT" GridPane.rowIndex="5">
+                                          <tooltip><Tooltip text="Удалить выделенные интервалы недопустимого времени"/></tooltip>
+                                       </Button>
                                        <Label text="Непригодное для посещающего время" GridPane.halignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                        <ListView fx:id="unsuitableIntervalList" GridPane.columnSpan="2" GridPane.rowIndex="6" GridPane.halignment="CENTER" GridPane.vgrow="ALWAYS"
                                                  prefHeight="300" maxHeight="Infinity" minHeight="200">
@@ -190,7 +197,9 @@
                                              <Label textAlignment="CENTER" text="Непригодное для посещающего время"/>
                                           </placeholder>
                                        </ListView>
-                                       <Button fx:id="removeUnwantedInterval" GridPane.halignment="LEFT" GridPane.rowIndex="7"/>
+                                       <Button fx:id="removeUnwantedInterval" GridPane.halignment="LEFT" GridPane.rowIndex="7">
+                                          <tooltip><Tooltip text="Удалить выделенные интервалы нежелательного времени"/></tooltip>
+                                       </Button>
                                        <Label text="Нежелательное для посещающего время" GridPane.halignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                                        <ListView fx:id="unwantedIntervalList" GridPane.columnSpan="2" GridPane.rowIndex="8" GridPane.halignment="CENTER" GridPane.vgrow="ALWAYS"
                                                  prefHeight="300" maxHeight="Infinity" minHeight="200">
@@ -200,7 +209,9 @@
                                        </ListView>
                                        <Button fx:id="addInterval" disable="true" text="Добавить интервал"
                                                GridPane.columnSpan="2" GridPane.rowIndex="9"
-                                               GridPane.halignment="CENTER"/>
+                                               GridPane.halignment="CENTER">
+                                          <tooltip><Tooltip text="Добавить временной интервал с нежелательным или недопустимым временем для посещающего посещения"/></tooltip>
+                                       </Button>
                                        <Button fx:id="saveTutor" disable="true" style="-fx-font-weight:bold"
                                                text="Сохранить изменения" GridPane.columnSpan="2"
                                                GridPane.rowIndex="10" GridPane.halignment="CENTER"/>
