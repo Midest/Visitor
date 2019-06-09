@@ -292,7 +292,7 @@ public class Main extends Application {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle( "Visitor" );
         this.primaryStage.setMinHeight( 750 );
-        this.primaryStage.setMinWidth( 1250 );
+        this.primaryStage.setMinWidth( 1320 );
         initRootLayout();
         showOverview();
         primaryStage.show();
