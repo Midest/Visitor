@@ -8,6 +8,7 @@ import me.midest.model.Visit;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +18,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by Dmitry on 31.03.2016.
+ * Класс для создания листов контроля.
+ * @version 20190609
  */
 public class VisitsSheets {
 
@@ -31,17 +33,16 @@ public class VisitsSheets {
                 - WorkbookReader.getExcelColumnIndex( Fields.START.getColumn() ) + 1;
     }
 
-    public HSSFWorkbook generate( Collection<Visit> visits ) throws IOException {
+    public Workbook generate( Collection<Visit> visits ) throws IOException {
         Workbook workbook = reader.read( new File( TEMPLATE_NAME ) );
-        if( workbook instanceof HSSFWorkbook ) {
-            HSSFWorkbook wb = ( HSSFWorkbook )workbook;
-            fill( wb, visits );
-            return wb;
+        if( workbook instanceof HSSFWorkbook || workbook instanceof XSSFWorkbook ){
+            fill( workbook, visits );
+            return workbook;
         }
         return null;
     }
 
-    private void fill( HSSFWorkbook template, Collection<Visit> visits ) {
+    private void fill( Workbook template, Collection<Visit> visits ) {
         List<Visit> visitsList = new ArrayList<>( visits );
         Collections.sort( visitsList, VisitsDatesComparator.comparator );
         calculateVisitsCounts( visitsList );
@@ -52,7 +53,7 @@ public class VisitsSheets {
         putData( template, visitsList );
     }
 
-    private void putData( HSSFWorkbook template, List<Visit> visits ) {
+    private void putData( Workbook template, List<Visit> visits ) {
         Sheet sheetBoss = template.getSheet( SHEET_NAME_BOSS );
         Sheet sheetOther = template.getSheet( SHEET_NAME_OTHER );
         int indexBoss = -1;
@@ -99,8 +100,8 @@ public class VisitsSheets {
             case DISCIPLINE: cell.setCellValue( l.getDiscipline()); break;
             case LESSON_TYPE: cell.setCellValue( getLessonTypeName( l.getType() )); break;
             case LESSON_THEME: cell.setCellValue( l.getName()); break;
-            case TUTOR_REGALIA: cell.setCellValue( getFullRegalia( l.getTutor() )); break;
-            case VISITOR_REGALIA: cell.setCellValue( getFullRegalia( v.getVisitor() )); break;
+            case TUTOR_REGALIA: cell.setCellValue( getShortRegalia( l.getTutor() )); break;
+            case VISITOR_REGALIA: cell.setCellValue( getShortRegalia( v.getVisitor() )); break;
             case VISITOR_POSITION_OTHER: cell.setCellValue( getPosition( v.getVisitor())); break;
             case VISITOR_NAME_OTHER: cell.setCellValue( v.getVisitor().getReverseInitialsName()); break;
             case TUTOR_POSITION:
@@ -125,22 +126,25 @@ public class VisitsSheets {
                 + tutor.getName();
     }
 
+    private String getShortRegalia( Tutor tutor ){
+        return tutor.getTitles();
+    }
+
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern( "dd.MM.yyyy" );
     private static final int FACULTY_CAPTURE_GROUP = 1;
-    private static final Pattern npGroups = Pattern.compile( "НП([1-3])\\d{2}" );
+    private static final Pattern npGroups = Pattern.compile( "НП-([1-3])\\d" );
     private static final Pattern krGroups = Pattern.compile( "К\\d{2}" );
     private static String getFacultyByGroup( String group ){
-        Matcher iksi = npGroups.matcher( group );
-        if( iksi.find()) switch( Integer.valueOf( iksi.group( FACULTY_CAPTURE_GROUP ) ) ){
-            //TODO Учесть вариант нескольких групп с разных факультетов
-            case 1: return "НАиО";
-            case 2: return "";
-            case 3: return "";
+        Matcher np = npGroups.matcher( group );
+        if( np.find()) switch( Integer.valueOf( np.group( FACULTY_CAPTURE_GROUP ) ) ){
+            case 1: return "Факультет №1";
+            case 2: return "Факультет №2";
+            case 3: return "Факультет №3";
             default: return "";
         }
-        Matcher kr = krGroups.matcher( group );
-        if( kr.find())
-            return "КР";
+        Matcher k = krGroups.matcher( group );
+        if( k.find())
+            return "Факультет №4";
         return "";
     }
     private static String getLessonTypeName( String type ){
@@ -160,41 +164,32 @@ public class VisitsSheets {
         }
         return type;
     }
-    private static final Pattern rooms = Pattern.compile( "\\d{3}" );
     private static String getRoomFullName( String room ){
-        String roomString = room.replaceFirst( "а\\.", "" );
-        int str = roomString.indexOf( "кор" );
-        switch( roomString ){
-            case "ММ":
-            case "Орд": return roomString;
-        }
-        if( roomString.contains( "лаб" ))
-            return roomString.replace( '_', ' ' );
-        if( str != -1 )
-            str += 3;
-        Matcher m = rooms.matcher( roomString );
-        if( m.find())
-            return "1-" + ( str == - 1 ? '3' : roomString.charAt( str )) + "-" + m.group();
-        return roomString;
+        return room.replaceFirst( "а\\.", "" );
     }
 
     private void createBlanks( Sheet s, int visitsCount ) {
+        List<CellRangeAddress> merged = new ArrayList<>( s.getMergedRegions());
         for( int i = 1; i < visitsCount; i++ ){
             Iterator<Row> it = s.rowIterator();
             while( it.hasNext()){
                 Row row = it.next();
                 for( int j = 0; j < columnShift; j++ ){
                     Cell cell = row.getCell( j );
+                    if( cell == null ){
+                        System.out.println( "В шаблоне листов контроля ячейка ("
+                                + (row.getRowNum()+1) + ";" + (j+1) + ") не существует. Создаю." );
+                        cell = row.createCell( j );
+                    }
                     int index = j + columnShift * i;
-                    Cell cell2 = row.createCell( index, cell.getCellType() );
+                    Cell cell2 = row.createCell( index, cell.getCellTypeEnum());
                     s.setColumnWidth( index, s.getColumnWidth( j ) );
                     copyCell( cell, cell2 );
                 }
-                if( row.getRowNum() == WorkbookReader.getExcelRowIndex( Fields.HEADER1.getRow())
-                        || row.getRowNum() == WorkbookReader.getExcelRowIndex( Fields.HEADER2.getRow()) ){
-                    s.addMergedRegion( new CellRangeAddress( row.getRowNum(), row.getRowNum(), i * columnShift, (i+1) * columnShift - 1 ));
-                }
-
+            }
+            for( CellRangeAddress a : merged ){
+                s.addMergedRegion( new CellRangeAddress( a.getFirstRow(), a.getLastRow(),
+                        a.getFirstColumn() + i * columnShift, a.getLastColumn() + i * columnShift ));
             }
         }
     }
@@ -204,28 +199,28 @@ public class VisitsSheets {
         to.getCellStyle().cloneStyleFrom( from.getCellStyle() ); // use styles
         to.getCellStyle().setWrapText( true );
         to.setCellComment( from.getCellComment() );
-        switch (from.getCellType()) {
-            case Cell.CELL_TYPE_STRING:
+        switch (from.getCellTypeEnum()) {
+            case STRING:
                 to.setCellValue(from.getRichStringCellValue());
                 break;
-            case Cell.CELL_TYPE_NUMERIC:
+            case NUMERIC:
                 if ( DateUtil.isCellDateFormatted( from )) {
                     to.setCellValue( from.getDateCellValue() );
                 } else {
                     to.setCellValue( from.getNumericCellValue() );
                 }
                 break;
-            case Cell.CELL_TYPE_BOOLEAN:
+            case BOOLEAN:
                 to.setCellValue( from.getBooleanCellValue() );
                 break;
-            case Cell.CELL_TYPE_FORMULA:
+            case FORMULA:
                 to.setCellValue( from.getCellFormula() );
                 break;
             default:
         }
     }
 
-    private void setPrintArea( HSSFWorkbook book, int sheetIndex, int visitCount ) {
+    private void setPrintArea( Workbook book, int sheetIndex, int visitCount ) {
         String endCol = WorkbookReader.getExcelColumnName(
                 WorkbookReader.getExcelColumnIndex( Fields.END.getColumn() ) + (visitCount-1) * columnShift );
         book.setPrintArea( sheetIndex,
@@ -248,36 +243,35 @@ public class VisitsSheets {
     }
 
     private static Integer columnShift = 2;
-    private static final String TEMPLATE_NAME = "template_visit_report.xls";
+    private static final String TEMPLATE_PREF = "ext/";
+    private static final String TEMPLATE_NAME = TEMPLATE_PREF + "template_visit_report.xlsx";
     private static final String SHEET_NAME_BOSS = "Начальник";
     private static final String SHEET_NAME_OTHER = "Остальные";
     private  enum Fields {
-        HEADER1 ( "A", "1" ), // Заголовок 1 (на 2 ячейки)
-        HEADER2 ( "A", "13" ), // Заголовок 2 (на 2 ячейки)
+        DATE_TIME ( "G", "7" ), // Дата, время
+        FACULTY ( "E", "3" ), // Факультет
+        GROUP ( "C", "8" ), // Группа
+        ROOM ( "L", "10" ), // Аудитория
+        DISCIPLINE ( "D", "9" ), // Дисциплина
+        LESSON_TYPE ( "D", "10" ), // Тип занятия
+        LESSON_THEME ( "C", "11" ), // Тема занятия
 
-        DATE_TIME ( "B", "2" ), // Дата, время
-        FACULTY ( "B", "3" ), // Факультет
-        GROUP ( "B", "4" ), // Группа
-        ROOM ( "B", "5" ), // Аудитория
-        DISCIPLINE ( "B", "6" ), // Дисциплина
-        LESSON_TYPE ( "B", "7" ), // Тип занятия
-        LESSON_THEME ( "B", "8" ), // Тема занятия
-        TUTOR_REGALIA ( "B", "9" ), // Преподаватель
-        VISITOR_REGALIA ( "B", "10" ), // Посещающий
+        TUTOR_REGALIA ( "G", "29" ), // Преподаватель
+        VISITOR_REGALIA ( "G", "27" ), // Посещающий
 
-        TUTOR_POSITION ( "A", "37" ), // Должность преподаватля
-        TUTOR_NAME ( "B", "38" ), // Имя
+        TUTOR_POSITION ( "D", "29" ), // Должность преподаватля
+        TUTOR_NAME ( "P", "29" ), // Имя
 
-        VISITOR_POSITION_OTHER ( "A", "28" ), // Должность посещающего (не начальника)
-        VISITOR_NAME_OTHER ( "B", "29" ), // Имя посещающего (не начальника)
+        VISITOR_POSITION_OTHER ( "D", "27" ), // Должность посещающего (не начальника)
+        VISITOR_NAME_OTHER ( "P", "27" ), // Имя посещающего (не начальника)
 
-        TUTOR_POSITION_OTHER ( "A", "33" ), // Должность преподаватля (посещает не начальник)
-        TUTOR_NAME_OTHER ( "B", "34" ), // Имя (посещает не начальник)
+        TUTOR_POSITION_OTHER ( "D", "29" ), // Должность преподаватля (посещает не начальник)
+        TUTOR_NAME_OTHER ( "P", "29" ), // Имя (посещает не начальник)
 
-        NUMBER ( "A", "41" ), // Номер посещения по списку
+        NUMBER ( "B", "37" ), // Номер посещения по списку
 
         START( "A", "1" ), // Начальная ячейка
-        END( "B", "41" ), // Конечная ячейка
+        END( "R", "37" ), // Конечная ячейка
         ;
 
         private String cell;

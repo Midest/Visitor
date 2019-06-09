@@ -22,6 +22,7 @@ import me.midest.logic.coupling.VisitsValue;
 import me.midest.logic.files.TxtReader;
 import me.midest.logic.files.TxtWriter;
 import me.midest.logic.files.WorkbookWriter;
+import me.midest.logic.report.VisitsSheets;
 import me.midest.logic.report.VisitsTable;
 import me.midest.model.FixedVisit;
 import me.midest.model.Lesson;
@@ -36,6 +37,7 @@ import me.midest.model.time.TimePeriod;
 import me.midest.view.controls.TableSelectionTripleView;
 import me.midest.view.skins.TableSelectionTripleViewSkin;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.Wizard.LinearFlow;
@@ -170,7 +172,21 @@ public class ControllerOverview {
                 try {
                     workbookWriterService.write( selectedFile, wb );
                 } catch( IOException e1 ) {
-                    new Alert( Alert.AlertType.ERROR, "Проблема при сохранении файла:\n" + e1.getLocalizedMessage() ).show();
+                    new Alert( Alert.AlertType.ERROR, "Проблема при сохранении таблицы посещений:\n"
+                            + e1.getLocalizedMessage() ).show();
+                }
+                // Листы контроля
+                try {
+                    VisitsSheets vs = new VisitsSheets();
+                    wb = vs.generate( result );
+                    String sp = selectedFile.getAbsolutePath();
+                    String ext = wb instanceof XSSFWorkbook ? ".xlsx" : ".xls";
+                    File sheetsFile = new File( sp.substring( 0, sp.lastIndexOf( '.' ) )
+                            + "_листы контроля" + ext );
+                    workbookWriterService.write( sheetsFile, wb );
+                } catch( Exception e1 ){
+                    new Alert( Alert.AlertType.ERROR, "Проблема при сохранении листов контроля:\n"
+                            + e1.getLocalizedMessage() ).show();
                 }
             }
         }
@@ -189,7 +205,6 @@ public class ControllerOverview {
                 tp = selected.getUnsuitableIntervals();
                 tp.clear();
                 unsuitableIntervalList.getItems().forEach( tp::add );
-                //FIXME
             }
         });
 
