@@ -182,12 +182,12 @@
                                        <Label text="Проверяющий"  GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
                                        <Label text="Посещаемый"  GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
                                        <Label text="Звания, степени" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
-                                       <TextField fx:id="tutorNameField" disable="true"  GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                       <TextField fx:id="tutorNameField" editable="false" disable="true"  GridPane.columnIndex="1" GridPane.rowIndex="0" />
                                        <ComboBox fx:id="tutorWeightCombo" disable="true" prefWidth="350.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                        <CheckBox fx:id="tutorVisitorCheck" disable="true"  mnemonicParsing="false" text="отметьте, если преподаватель может посещать занятия" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                        <CheckBox fx:id="tutorVisiteeCheck" disable="true"  mnemonicParsing="false" text="отметьте, если занятия преподавателя нужно посетить" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                        <TextField fx:id="tutorTitlesField" disable="true"  GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-                                       <Button fx:id="removeUnsuitableInterval" GridPane.halignment="LEFT" GridPane.rowIndex="5">
+                                       <Button fx:id="removeUnsuitableInterval" disable="true" GridPane.halignment="LEFT" GridPane.rowIndex="5">
                                           <tooltip><Tooltip text="Удалить выделенные интервалы недопустимого времени"/></tooltip>
                                        </Button>
                                        <Label text="Непригодное для посещающего время" GridPane.halignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="5" />
@@ -197,7 +197,7 @@
                                              <Label textAlignment="CENTER" text="Непригодное для посещающего время"/>
                                           </placeholder>
                                        </ListView>
-                                       <Button fx:id="removeUnwantedInterval" GridPane.halignment="LEFT" GridPane.rowIndex="7">
+                                       <Button fx:id="removeUnwantedInterval" disable="true" GridPane.halignment="LEFT" GridPane.rowIndex="7">
                                           <tooltip><Tooltip text="Удалить выделенные интервалы нежелательного времени"/></tooltip>
                                        </Button>
                                        <Label text="Нежелательное для посещающего время" GridPane.halignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="7" />
@@ -212,9 +212,25 @@
                                                GridPane.halignment="CENTER">
                                           <tooltip><Tooltip text="Добавить временной интервал с нежелательным или недопустимым временем для посещающего посещения"/></tooltip>
                                        </Button>
+
+                                       <Button fx:id="removeAllowedVisitors" disable="true" GridPane.halignment="LEFT" GridPane.rowIndex="10">
+                                          <tooltip><Tooltip text="Удалить выделенных допустимых проверяющих"/></tooltip>
+                                       </Button>
+                                       <Label text="Допустимые проверяющие" GridPane.halignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+                                       <ListView fx:id="allowedVisitors" GridPane.columnSpan="2" GridPane.rowIndex="11" GridPane.halignment="CENTER" GridPane.vgrow="ALWAYS"
+                                                 prefHeight="180" maxHeight="Infinity" minHeight="180">
+                                          <placeholder>
+                                             <Label textAlignment="CENTER" text="Допустимые проверяющие (если список пуст, то все подходят)"/>
+                                          </placeholder>
+                                       </ListView>
+                                       <Button fx:id="addVisitorConstraints" disable="true" text="Добавить ограничения по посещающим"
+                                               GridPane.columnSpan="2" GridPane.rowIndex="12"
+                                               GridPane.halignment="CENTER">
+                                          <tooltip><Tooltip text="Добавить людей в список допустимых посещающих"/></tooltip>
+                                       </Button>
                                        <Button fx:id="saveTutor" disable="true" style="-fx-font-weight:bold"
                                                text="Сохранить изменения" GridPane.columnSpan="2"
-                                               GridPane.rowIndex="10" GridPane.halignment="CENTER"/>
+                                               GridPane.rowIndex="13" GridPane.halignment="CENTER"/>
                                     </children>
                                  </GridPane>
                               </content>

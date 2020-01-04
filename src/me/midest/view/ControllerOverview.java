@@ -34,7 +34,9 @@ import me.midest.model.time.Interval;
 import me.midest.model.time.PeriodUnit;
 import me.midest.model.time.Periodical;
 import me.midest.model.time.TimePeriod;
+import me.midest.view.controls.FXUtils;
 import me.midest.view.controls.TableSelectionTripleView;
+import me.midest.view.editors.TutorFXListCell;
 import me.midest.view.skins.TableSelectionTripleViewSkin;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -109,9 +111,15 @@ public class ControllerOverview {
     private ListView<Interval> unsuitableIntervalList;
     @FXML
     private Button addInterval;
+    @FXML
+    private Button removeAllowedVisitors;
+    @FXML
+    private ListView<TutorFX> allowedVisitors;
+    @FXML
+    private Button addVisitorConstraints;
 
-    final FileChooser xlsFileChooser = new FileChooser();
-    final FileChooser allFileChooser = new FileChooser();
+    private final FileChooser xlsFileChooser = new FileChooser();
+    private final FileChooser allFileChooser = new FileChooser();
 
     @FXML
     private void initialize() {
@@ -134,7 +142,6 @@ public class ControllerOverview {
         tutorsTable.getColumns().addAll( list2 );
         tutorsTable.getSelectionModel().selectedItemProperty().addListener(
                 ( observable, oldValue, newValue ) -> showTutorDetails( newValue ) );
-        tutorNameField.setEditable( false );
         tutorWeightCombo.setItems( FXCollections.observableArrayList( Tutor.Status.values() ));
         loadSchedule.setOnAction( e -> {
             xlsFileChooser.setTitle( "Выберите файл расписания занятий преподавателей" );
@@ -221,6 +228,33 @@ public class ControllerOverview {
                 unwantedIntervalList.getItems().removeAll(
                         unwantedIntervalList.getSelectionModel().getSelectedItems())
         );
+        removeAllowedVisitors.setGraphic( fa.create( FontAwesome.Glyph.REMOVE ) );
+        allowedVisitors.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
+        allowedVisitors.setCellFactory( l -> new TutorFXListCell());
+        addVisitorConstraints.setOnAction( e -> {
+            Alert selectionWindow = new Alert( Alert.AlertType.CONFIRMATION );
+            selectionWindow.setTitle( "Добавление ограничений по посещающим" );
+
+            selectionWindow.getDialogPane().setMaxWidth( 400 );
+            selectionWindow.setHeaderText( "Выберите преподавателей и допустимых проверяющих для них. " +
+                    "Только выбранные проверяющие (а также добавленные ранее) смогут посещать выбранных преподавателей." );
+
+            Node content = createVisitorConstraints();
+            VisitorConstraints vc = (VisitorConstraints) FXUtils.getController( content );
+            vc.setTutors( tutorsTable.getItems());
+
+            selectionWindow.getDialogPane().setContent( content );
+            selectionWindow.getButtonTypes().setAll(
+                    new ButtonType( "Добавить связи и сохранить", ButtonBar.ButtonData.OK_DONE ),
+                    new ButtonType( "Отмена", ButtonBar.ButtonData.CANCEL_CLOSE ));
+            selectionWindow.showAndWait()
+                    .filter( response -> response.getButtonData() == ButtonBar.ButtonData.OK_DONE )
+                    .ifPresent( response -> addVisitorConstraints( vc ));
+        });
+        removeAllowedVisitors.setOnAction( e ->
+                allowedVisitors.getItems().removeAll(
+                    allowedVisitors.getSelectionModel().getSelectedItems())
+        );
 
         ValueExtractor.addValueExtractor( n -> n instanceof Spinner, ta -> ((Spinner)ta).getValue());
         ValueExtractor.addValueExtractor( n -> n instanceof ToggleSwitch, ta -> ((ToggleSwitch)ta).isSelected());
@@ -290,6 +324,24 @@ public class ControllerOverview {
                 }
             });
         } );
+    }
+
+    private void addVisitorConstraints( VisitorConstraints vc ){
+        if( vc == null ) return;
+        Collection<TutorFX> visitors = vc.getSelectedVisitors();
+        vc.getSelectedVisitees().forEach( t -> t.getAllowedVisitors().addAll( visitors ));
+    }
+
+    private Node visitorConstraintsNode;
+    private Node createVisitorConstraints() {
+        if( visitorConstraintsNode == null ) try {
+            return visitorConstraintsNode = FXMLLoader
+                    .<Parent>load( getClass().getResource( "/view/VisitorConstraints.fxml" ) );
+        } catch( IOException e ) {
+            e.printStackTrace();
+            return null;
+        }
+        else return visitorConstraintsNode;
     }
 
     private BorderPane _createFixedSizePane(){
@@ -365,12 +417,12 @@ public class ControllerOverview {
             PeriodUnit unit = PeriodUnit.byText( unitText.toString());
             text
                     .append( "\n" )
-                    .append( unit.equals( PeriodUnit.WEEKS ) ?
+                    .append( PeriodUnit.WEEKS.equals( unit ) ?
                             "каждую " : "каждый ")
                     .append( s.get( _intervalFields[10] ))
                     .append( " " )
                     .append( unitText );
-            if( unit.equals( PeriodUnit.WEEKS ))
+            if( PeriodUnit.WEEKS.equals( unit ))
                 text.setCharAt( text.length()-1, 'ю' );
         }
         text.append( " интервал\n" );
@@ -423,11 +475,13 @@ public class ControllerOverview {
             i = p = new Periodical();
         if( i == null )
             return null;
-        if( isPeriodical && hasUnit ){
+        if( isPeriodical && hasUnit ) {
             Object unitText = s.get( _intervalFields[11] );
-            PeriodUnit unit = PeriodUnit.byText( unitText.toString());
-            p.setUnit( unit );
-            p.setDuration( Integer.parseInt( s.get( _intervalFields[10] ).toString()));
+            PeriodUnit unit = PeriodUnit.byText( unitText.toString() );
+            if( p != null ){
+                p.setUnit( unit );
+                p.setDuration( Integer.parseInt( s.get( _intervalFields[10] ).toString() ) );
+            }
         }
         if( checkTime ) {
             String timeStart = (String) s.get( _intervalFields[0] );
@@ -442,7 +496,9 @@ public class ControllerOverview {
         if( checkDates && isPeriodical ) {
             LocalDate dateFrom = ((LocalDate) s.get( _intervalFields[3] ));
             LocalDate dateTo = ((LocalDate) s.get( _intervalFields[4] ));
-            p.setDates( dateFrom, dateTo );
+            if( p != null ) {
+                p.setDates( dateFrom, dateTo );
+            }
         }
         return i;
     }
@@ -518,10 +574,17 @@ public class ControllerOverview {
         tutorVisiteeCheck.disableProperty().set( isNull );
         tutorTitlesField.disableProperty().set( isNull );
         saveTutor.disableProperty().set( isNull );
+        removeUnsuitableInterval.disableProperty().set( isNull );
+        removeUnwantedInterval.disableProperty().set( isNull );
         addInterval.disableProperty().set( isNull );
+        removeAllowedVisitors.disableProperty().set( isNull );
+        addVisitorConstraints.disableProperty().set( isNull );
+        if( !isNull )
+            allowedVisitors.setItems( tutor.getAllowedVisitors());
     }
 
-    private <S,T> List<TableColumn<S,T>> createCols( Pair<String,String>... properties ) {
+    @SafeVarargs
+    private final <S,T> List<TableColumn<S,T>> createCols( Pair<String,String>... properties ) {
         List<TableColumn<S,T>> columns = new ArrayList<>( properties.length );
         for( Pair<String,String> property : properties ) if( property != null )
             columns.add( createCol( property ));
@@ -559,6 +622,7 @@ public class ControllerOverview {
         initActions();
     }
 
+    @SuppressWarnings( "unchecked" )
     private void initActions() {
         TableSelectionTripleViewSkin<VisitFX> view = ( (TableSelectionTripleViewSkin<VisitFX>) visitsTables.getSkin() );
         view.setLoadFileToSecondAction( () -> {
