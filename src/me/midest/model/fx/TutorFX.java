@@ -1,12 +1,16 @@
 package me.midest.model.fx;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import me.midest.model.Tutor;
 import me.midest.model.Tutor.Status;
 import me.midest.model.time.TimePeriod;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class TutorFX {
 
@@ -21,6 +25,9 @@ public class TutorFX {
     private TimePeriod unwantedIntervals;
     private TimePeriod unsuitableIntervals;
 
+    private Set<TutorFX> allowedVisitorsSet;
+    private ObservableList<TutorFX> allowedVisitors;
+
     public TutorFX( Tutor tutor ){
         this.tutor = tutor;
         this.name = new SimpleStringProperty( tutor.getName());
@@ -32,6 +39,22 @@ public class TutorFX {
         this.visitee.addListener( e -> tutor.setVisitee( visitee.get() ) );
         this.unwantedIntervals = new TimePeriod();
         this.unsuitableIntervals = new TimePeriod();
+
+        this.allowedVisitorsSet = new HashSet<>();
+        this.allowedVisitors = FXCollections.observableArrayList();
+        allowedVisitors.addListener( (ListChangeListener<TutorFX>) c -> {  // выкидываем повторения TODO подумать над лучшим решением
+            while( c.next()) {
+                if( c.wasAdded() ) {
+                    List<? extends TutorFX> added = c.getAddedSubList();
+                    added.forEach( t -> {
+                        if( !allowedVisitorsSet.add( t ) )
+                            allowedVisitors.remove( t );
+                    } );
+                }
+                if( c.wasRemoved() )
+                    allowedVisitorsSet.removeAll( c.getRemoved());
+            }
+        });
     }
 
     public StringProperty nameProperty() {
@@ -44,6 +67,10 @@ public class TutorFX {
 
     public StringProperty titlesProperty() {
         return titles;
+    }
+
+    public ObservableList<TutorFX> getAllowedVisitors() {
+        return allowedVisitors;
     }
 
     public void setWeight( Status weight ) {
@@ -84,4 +111,10 @@ public class TutorFX {
         final TutorFX that = (TutorFX)other;
         return this.getTutor().equals( that.getTutor());
     }
+
+    @Override
+    public int hashCode() {
+        return this.getTutor().hashCode();
+    }
+
 }
