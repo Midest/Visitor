@@ -192,7 +192,7 @@
                                        </Button>
                                        <Label text="Непригодное для посещающего время" GridPane.halignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                        <ListView fx:id="unsuitableIntervalList" GridPane.columnSpan="2" GridPane.rowIndex="6" GridPane.halignment="CENTER" GridPane.vgrow="ALWAYS"
-                                                 prefHeight="300" maxHeight="Infinity" minHeight="200">
+                                                 prefHeight="180" maxHeight="Infinity" minHeight="180">
                                           <placeholder>
                                              <Label textAlignment="CENTER" text="Непригодное для посещающего время"/>
                                           </placeholder>
@@ -202,7 +202,7 @@
                                        </Button>
                                        <Label text="Нежелательное для посещающего время" GridPane.halignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                                        <ListView fx:id="unwantedIntervalList" GridPane.columnSpan="2" GridPane.rowIndex="8" GridPane.halignment="CENTER" GridPane.vgrow="ALWAYS"
-                                                 prefHeight="300" maxHeight="Infinity" minHeight="200">
+                                                 prefHeight="180" maxHeight="Infinity" minHeight="180">
                                           <placeholder>
                                              <Label textAlignment="CENTER" text="Нежелательное для посещающего время"/>
                                           </placeholder>
