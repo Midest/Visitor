@@ -48,6 +48,7 @@ public class TermCoupling {
     private Set<FixedVisit> fixedVisits;
     private Map<Tutor, TimePeriod> unwantedIntervals;
     private Map<Tutor, TimePeriod> unsuitableIntervals;
+    private Map<Tutor, Collection<Tutor>> allowedVisitors;
 
     private LocalDate firstDate;
     private LocalDate lastDate;
@@ -73,6 +74,8 @@ public class TermCoupling {
 
         unwantedIntervals = new HashMap<>();
         unsuitableIntervals = new HashMap<>();
+
+        allowedVisitors = new HashMap<>();
     }
 
     public Term getTerm() {
@@ -121,6 +124,10 @@ public class TermCoupling {
 
     public void setUnwantedIntervalsForTutor( Tutor t, TimePeriod intervals ){
         unwantedIntervals.put( t, intervals );
+    }
+
+    public void setAllowedVisitorsForTutor( Tutor tutor, Collection<Tutor> visitors ){
+        allowedVisitors.put( tutor, visitors );
     }
 
      /**
@@ -305,7 +312,8 @@ public class TermCoupling {
             if( dateIsOk( lesson.getDate(), withWeekend ))  // Проверка дат
                 for( Tutor visitor : byTutor.keySet()){
                     if( possibleVisitors.contains( visitor )
-                            && !visitor.equals( tutor )){ // Если преподаватель подходит...
+                            && !visitor.equals( tutor )
+                            && visitorIsAllowed( tutor, visitor )){ // Если преподаватель подходит...
                         if( dateForVisitorIsSuitable( visitor, lesson ) && // ...и не занят...
                                 !hasLesson( visitor, byTutor.get( visitor ), lesson )){ // ...и у него нет пары...
                             addVisit( visits, visitor, lesson, byTutor );
@@ -338,6 +346,12 @@ public class TermCoupling {
     private boolean dateForVisitorIsOk( Tutor visitor, Lesson lesson ) {
         TimePeriod tp = unwantedIntervals.get( visitor );
         return tp == null || !tp.contains( lesson.getDate(), lesson.getTime(), firstDate, lastDate );
+    }
+
+    /** Проверка ограничения по проверяющим */
+    private boolean visitorIsAllowed( Tutor tutor, Tutor visitor ){
+        Collection<Tutor> v = allowedVisitors.get( tutor );
+        return v == null || v.size() == 0 || v.contains( visitor );
     }
 
     /**
@@ -552,6 +566,7 @@ public class TermCoupling {
         Set<Lesson> lessons = term.getByTutors().get( tutor );
         for( Lesson lesson : lessons ){
             for( Tutor visitor : bosses ){
+                // Нет проверки на допустимость посещающего.
                 // Нет проверки на наличие посещений у посещающего, что логично,
                 // учитывая, что это последняя попытка добавить.
                 // Значит помешало добавленное посещение.

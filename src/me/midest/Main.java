@@ -140,6 +140,11 @@ public class Main extends Application {
 
         List<Tutor> tutorsList = tutors.parallelStream().map( TutorFX::getTutor ).collect( Collectors.toList());
 
+        // Задаем ограничения на посещающих
+        List<TutorFX> withAllowedVisitors = tutors.parallelStream().filter( t -> !t.getAllowedVisitors().isEmpty()).collect( Collectors.toList());
+        withAllowedVisitors.forEach( t -> coupler.setAllowedVisitorsForTutor( t.getTutor(),
+                t.getAllowedVisitors().stream().map( TutorFX::getTutor ).collect( Collectors.toSet())));
+
         // Задаем фиксированные посещения
         Collection<Visit> fixed = second.parallelStream().map( VisitFX::getVisit ).collect( Collectors.toList());
         coupler.setFixedVisits( fixed );
