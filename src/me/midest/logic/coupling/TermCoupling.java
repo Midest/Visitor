@@ -1,10 +1,10 @@
 package me.midest.logic.coupling;
 
+import javafx.scene.control.Alert;
 import javafx.util.Pair;
 import me.midest.model.*;
 import me.midest.model.time.TimePeriod;
 
-import javax.swing.*;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
@@ -234,12 +234,11 @@ public class TermCoupling {
     }
 
     private void removeTutorsWithNoLessons( Term term ) {
-        Set<Tutor> toRemove = new HashSet<>();
-        toVisit.stream().forEach( tutor -> {
-            if( term.getByTutors().get( tutor ) == null
-                    || term.getByTutors().get( tutor ).isEmpty()) toRemove.add( tutor );
-        });
-        toVisit.removeAll( toRemove );
+        // Удаляем, если нет пар вообще
+        toVisit.removeIf( tutor ->
+                ( term.getByTutors().get( tutor ) == null
+                || term.getByTutors().get( tutor ).isEmpty())
+        );
     }
 
     private void setFirstAndLastDates( Term term ){
@@ -536,9 +535,7 @@ public class TermCoupling {
         }
 
         // Список подходит, потому что не будет повторяющихся значений
-        List<LessonCount> counters = new ArrayList<>();
-        for( LessonCount count : visited.values())
-            counters.add( count );
+        List<LessonCount> counters = new ArrayList<>(visited.values());
 
         // Добавляем тех, у кого ноль возможных посещений
         if( withNulls ) for( Tutor tutor : withoutPossibleVisits ) {
@@ -595,8 +592,7 @@ public class TermCoupling {
         Tutor tutor = counter.getTutor();
 
         if( counter.isNill()) {
-            JOptionPane.showMessageDialog( null, counter.getTutor().getName() + ": никто не может посетить",
-                    "Проблема", JOptionPane.ERROR_MESSAGE );
+            new Alert(Alert.AlertType.ERROR, counter.getTutor().getName() + ": никто не может посетить").show();
             return false;
         }
 
