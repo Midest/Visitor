@@ -101,8 +101,8 @@ public class Main extends Application {
     public void loadSchedule( String fileName ) {
         try {
             clearLists();
-            String year = deriveYear( fileName );
-            Term term = deriveTerm( fileName );
+            String year = extractYear( fileName );
+            Term term = extractTerm( fileName );
             initServices( fileName, year, term );
             generateSchedule();
 
@@ -110,13 +110,13 @@ public class Main extends Application {
     }
 
     private static final Pattern YEAR_REG = Pattern.compile( ".*(20\\d{2}).*" );
-    private String deriveYear( String fileName ) {
-        int index = fileName.lastIndexOf( "/" );
+    private String extractYear( String fileName ) {
+        int index = fileName.lastIndexOf( File.separator );
         String file = fileName.substring( index == -1 ? 0 : index );
         Matcher m = YEAR_REG.matcher( file );
         return m.find() ? m.group(1) : String.valueOf( Calendar.getInstance().get( Calendar.YEAR ));
     }
-    private Term deriveTerm( String fileName ) {
+    private Term extractTerm( String fileName ) {
         int index = fileName.lastIndexOf( "/" );
         String file = fileName.substring( index == -1 ? 0 : index ).toLowerCase();
         for( Term t : Term.values())
